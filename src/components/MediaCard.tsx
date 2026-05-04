@@ -1,0 +1,42 @@
+/* eslint-disable @next/next/no-img-element */
+import Link from "next/link";
+import { TMDBItem } from "@/lib/tmdb";
+
+export default function MediaCard({ item }: { item: TMDBItem }) {
+  // If media_type isn't strictly defined, we can guess based on 'title' (movie) vs 'name' (tv)
+  // For discovery endpoints we'll just have to pass a prop, but here we assume 'name' means TV.
+  const isTV = item.media_type === "tv" || (!item.media_type && item.name && !item.title);
+  const title = item.title || item.name;
+  const link = isTV ? `/tv/${item.id}` : `/movie/${item.id}`;
+  
+  return (
+    <Link href={link} className="block group w-[140px] md:w-[180px] flex-shrink-0">
+      <div className="relative aspect-[2/3] rounded-xl overflow-hidden border border-white/5 group-hover:border-vortex-purple/50 group-hover:shadow-[0_0_20px_rgba(124,77,255,0.6)] transition-all bg-white/5">
+        {item.poster_path ? (
+          <img 
+            src={`https://image.tmdb.org/t/p/w500${item.poster_path}`} 
+            alt={title || "Poster"}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center p-4 text-center text-sm text-gray-500">
+            {title}
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+            <span className="text-white text-xs font-semibold drop-shadow-md">Watch Now</span>
+        </div>
+      </div>
+      <h3 className="mt-3 text-sm text-gray-300 font-medium truncate group-hover:text-vortex-blue transition-colors group-hover:drop-shadow-[0_0_5px_rgba(0,176,255,0.8)]">
+        {title}
+      </h3>
+      {item.vote_average ? (
+         <div className="flex items-center mt-1 space-x-1">
+             <span className="text-vortex-purple text-xs">★</span>
+             <span className="text-gray-400 text-xs">{item.vote_average.toFixed(1)}</span>
+         </div>
+      ) : null}
+    </Link>
+  );
+}

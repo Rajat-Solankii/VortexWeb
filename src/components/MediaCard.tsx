@@ -9,6 +9,10 @@ export default function MediaCard({ item, onRemove }: { item: TMDBItem, onRemove
   const title = item.title || item.name;
   const link = isTV ? `/tv/${item.id}` : `/movie/${item.id}`;
   
+  const now = new Date().toISOString().split('T')[0];
+  const releaseDate = item.release_date || item.first_air_date;
+  const isComingSoon = releaseDate && releaseDate > now;
+  
   return (
     <div className="relative group w-[140px] md:w-[180px] flex-shrink-0">
       <Link href={link} className="block">
@@ -26,8 +30,13 @@ export default function MediaCard({ item, onRemove }: { item: TMDBItem, onRemove
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-              <span className="text-white text-xs font-semibold drop-shadow-md">Watch Now</span>
+              <span className="text-white text-xs font-semibold drop-shadow-md">{isComingSoon ? 'Coming Soon' : 'Watch Now'}</span>
           </div>
+          {isComingSoon && (
+            <div className="absolute top-2 left-2 bg-vortex-purple text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-lg backdrop-blur-sm z-10 border border-white/20">
+              COMING SOON
+            </div>
+          )}
         </div>
       </Link>
 

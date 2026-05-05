@@ -51,7 +51,7 @@ export async function fetchTMDB(path: string, params: Record<string, string> = {
 }
 
 // Utility to filter out junk results
-export function cleanData(items: TMDBItem[], strict: boolean = true): TMDBItem[] {
+export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnreleased: boolean = false): TMDBItem[] {
   if (!items) return [];
 
   const ADULT_KEYWORDS = [
@@ -76,12 +76,12 @@ export function cleanData(items: TMDBItem[], strict: boolean = true): TMDBItem[]
     // Basic Quality Filter: missing posters/backdrops/overview
     if (!item.poster_path || !item.backdrop_path || !item.overview) return false;
 
-    // Playability check: Ensure it has been released and has some ratings (indicator of being a real distributed title)
+    // Playability check: Ensure it has been released (unless we allow unreleased)
     const releaseDate = item.release_date || item.first_air_date;
-    if (!releaseDate || releaseDate > now) return false;
+    if (!allowUnreleased && (!releaseDate || releaseDate > now)) return false;
     
-    // Items with very few votes are often unplayable or placeholders in databases
-    if (item.vote_count !== undefined && item.vote_count < 10) return false;
+    // Items with very few votes are often unplayable or placeholders (unless it's upcoming)
+    if (!allowUnreleased && item.vote_count !== undefined && item.vote_count < 10) return false;
 
     // Filter out genres that are usually not available on movie streaming sources
     // 10763 = News, 10767 = Talk, 10764 = Reality
@@ -214,7 +214,7 @@ export async function getBollywoodMovies() {
 
 export async function getUpcomingMovies() {
   const data = await fetchTMDB(`movie/upcoming?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  return cleanData(data?.results || [], true);
+  return cleanData(data?.results || [], true, true);
 }
 
 export async function getVideos(type: "movie" | "tv", id: string) {

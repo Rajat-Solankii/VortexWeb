@@ -16,6 +16,9 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
 
   if (!tv) return <div className="text-white text-center py-20">TV Show not found.</div>;
 
+  const now = new Date().toISOString().split('T')[0];
+  const isNotReleased = tv.first_air_date && tv.first_air_date > now;
+
   return (
     <div>
        <div className="relative w-full min-h-screen pb-12 pt-8 px-4 sm:px-6 lg:px-10 xl:px-16 mx-auto">
@@ -42,7 +45,19 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
              </div>
              
              <div className="w-full flex-1 min-w-0 max-w-6xl">
-                <TVPlayerContainer id={id} tv={tv} />
+                 {isNotReleased ? (
+                    <div className="w-full aspect-video bg-vortex-black/40 border border-white/10 rounded-2xl flex flex-col items-center justify-center text-center p-8 space-y-4">
+                      <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
+                        <span className="text-4xl">⏳</span>
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-white mb-2">Series Not Released Yet</h3>
+                        <p className="text-gray-400 max-w-md">This show is scheduled to premiere on <span className="text-vortex-purple font-medium">{tv.first_air_date}</span>. Stay tuned!</p>
+                      </div>
+                    </div>
+                 ) : (
+                    <TVPlayerContainer id={id} tv={tv} />
+                 )}
                 <TrailerPlayer trailers={trailers} />
                 <CastSection cast={cast} />
              </div>

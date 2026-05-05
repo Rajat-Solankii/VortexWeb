@@ -18,6 +18,9 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
 
   if (!movie) return <div className="text-white text-center py-20">Movie not found.</div>;
 
+  const now = new Date().toISOString().split('T')[0];
+  const isNotReleased = movie.release_date && movie.release_date > now;
+
   return (
     <div>
        <HistoryTracker item={{ ...movie, media_type: 'movie' }} />
@@ -47,9 +50,21 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
              <div className="w-full flex-1 min-w-0 flex flex-col justify-start max-w-6xl">
                 <div className="flex items-center justify-between mb-4">
                    <h2 className="text-2xl font-bold text-white">Watch Now</h2>
-                   <DownloadMediaButton type="movie" id={id} title={movie.title} />
+                   {!isNotReleased && <DownloadMediaButton type="movie" id={id} title={movie.title} />}
                 </div>
-                 <VideoPlayer type="movie" id={id} />
+                 {isNotReleased ? (
+                    <div className="w-full aspect-video bg-vortex-black/40 border border-white/10 rounded-2xl flex flex-col items-center justify-center text-center p-8 space-y-4">
+                      <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
+                        <span className="text-4xl">⏳</span>
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-white mb-2">Not Released Yet</h3>
+                        <p className="text-gray-400 max-w-md">This title is scheduled for release on <span className="text-vortex-purple font-medium">{movie.release_date}</span>. Stay tuned!</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <VideoPlayer type="movie" id={id} />
+                  )}
                  <TrailerPlayer trailers={trailers} />
                  <CastSection cast={cast} />
               </div>

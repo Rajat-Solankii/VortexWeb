@@ -62,7 +62,7 @@ export default function PrivacyPage() {
 
           <div className="space-y-4 pt-8 border-t border-white/10">
             <p className="text-sm text-white/40">
-              If you have any questions about this Privacy Policy, please contact us at <span className="text-blue-400">privacy@vortex-streaming.com</span>.
+              If you have any questions about this Privacy Policy, please contact us at <span className="text-blue-400">watchvortexofficial@gmail.com</span>.
             </p>
           </div>
         </section>

@@ -41,7 +41,7 @@ export default function DMCAPage() {
             <h2 className="text-2xl font-semibold text-white">3. Contact Information</h2>
             <p>
               Please send all DMCA notices to: <br />
-              <span className="text-blue-400 font-medium">legal@vortex-streaming.com</span>
+              <span className="text-blue-400 font-medium">watchvortexofficial@gmail.com</span>
             </p>
             <p className="text-sm text-white/50 italic">
               Please allow 48-72 hours for a response. Note that emailing your complaint to other parties such as our Internet Service Provider will not expedite your request and may result in a delayed response due the complaint not properly being filed.

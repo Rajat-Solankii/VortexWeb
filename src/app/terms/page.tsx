@@ -53,7 +53,7 @@ export default function TermsPage() {
 
           <div className="space-y-4 pt-8 border-t border-white/10">
             <p className="text-sm text-white/40">
-              For any questions regarding these terms, please contact us at <span className="text-blue-400">support@vortex-streaming.com</span>.
+              For any questions regarding these terms, please contact us at <span className="text-blue-400">watchvortexofficial@gmail.com</span>.
             </p>
           </div>
         </section>

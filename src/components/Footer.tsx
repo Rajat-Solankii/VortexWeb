@@ -32,7 +32,7 @@ export default function Footer() {
 
           <div className="flex flex-col gap-3 col-span-2 sm:col-span-1">
             <h3 className="text-white font-semibold mb-1">Support</h3>
-            <Link href="mailto:support@vortex.com" className="text-white/60 hover:text-white transition-colors">Contact Us</Link>
+            <Link href="mailto:watchvortexofficial@gmail.com" className="text-white/60 hover:text-white transition-colors">Contact Us</Link>
           </div>
         </div>
       </div>

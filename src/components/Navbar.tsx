@@ -26,19 +26,19 @@ export default function Navbar() {
             <Link href="/" className="text-2xl font-black text-vortex-purple tracking-tighter drop-shadow-[0_0_10px_rgba(124,77,255,0.8)]">
               VORTEX
             </Link>
-            <div className="hidden md:block">
-              <div className="flex items-baseline space-x-6">
+            <div className="hidden lg:block">
+              <div className="flex items-baseline space-x-4 xl:space-x-6">
                 <Link href="/movies" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Movies</Link>
-                <Link href="/hollywood" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Hollywood</Link>
-                <Link href="/bollywood" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Bollywood</Link>
+                <Link href="/hollywood" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all hidden xl:block">Hollywood</Link>
+                <Link href="/bollywood" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all hidden xl:block">Bollywood</Link>
                 <Link href="/tv" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">TV Shows</Link>
-                <Link href="/anime" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Anime</Link>
+                <Link href="/anime" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all hidden 2xl:block">Anime</Link>
                 <Link href="/genres" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Genres</Link>
                 <Link href="/drama" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Drama</Link>
               </div>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center space-x-4">
             <form onSubmit={handleSearch} className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
@@ -53,10 +53,13 @@ export default function Navbar() {
             </form>
             <DownloadAppButton />
           </div>
-          <div className="md:hidden flex items-center gap-3">
+          <div className="lg:hidden flex items-center gap-3">
              <div className="scale-90"><DownloadAppButton /></div>
-             <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-300 hover:text-white">
-               {isMobileMenuOpen ? <X /> : <Menu />}
+             <button
+               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+               className="p-2 text-gray-400 hover:text-white transition-colors"
+             >
+               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
              </button>
           </div>
         </div>
@@ -64,7 +67,7 @@ export default function Navbar() {
       
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-vortex-black/95 backdrop-blur-xl border-b border-white/10 px-4 pt-2 pb-4 space-y-4">
+        <div className="lg:hidden bg-vortex-black/95 backdrop-blur-xl border-b border-white/10 px-4 pt-2 pb-6 space-y-6">
            <form onSubmit={handleSearch} className="relative w-full">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
@@ -77,14 +80,14 @@ export default function Navbar() {
                 className="bg-white/5 border border-white/10 text-white text-sm rounded-full focus:ring-vortex-purple focus:border-vortex-purple block w-full pl-10 p-2 transition-all placeholder-gray-400 focus:bg-white/10"
               />
             </form>
-            <div className="flex flex-col space-y-3">
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/movies" className="text-gray-300 hover:text-white font-medium">Movies</Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/hollywood" className="text-gray-300 hover:text-white font-medium">Hollywood</Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/bollywood" className="text-gray-300 hover:text-white font-medium">Bollywood</Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/tv" className="text-gray-300 hover:text-white font-medium">TV Shows</Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/anime" className="text-gray-300 hover:text-white font-medium">Anime</Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/genres" className="text-gray-300 hover:text-white font-medium">Genres</Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/drama" className="text-gray-300 hover:text-white font-medium">Drama</Link>
+            <div className="grid grid-cols-2 gap-4">
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/movies" className="text-gray-300 hover:text-white font-medium p-2 bg-white/5 rounded-lg text-center">Movies</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/hollywood" className="text-gray-300 hover:text-white font-medium p-2 bg-white/5 rounded-lg text-center">Hollywood</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/bollywood" className="text-gray-300 hover:text-white font-medium p-2 bg-white/5 rounded-lg text-center">Bollywood</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/tv" className="text-gray-300 hover:text-white font-medium p-2 bg-white/5 rounded-lg text-center">TV Shows</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/anime" className="text-gray-300 hover:text-white font-medium p-2 bg-white/5 rounded-lg text-center">Anime</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/genres" className="text-gray-300 hover:text-white font-medium p-2 bg-white/5 rounded-lg text-center">Genres</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/drama" className="text-gray-300 hover:text-white font-medium p-2 bg-white/5 rounded-lg text-center col-span-2">Drama</Link>
             </div>
         </div>
       )}

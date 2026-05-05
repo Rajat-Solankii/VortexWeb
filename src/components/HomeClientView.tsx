@@ -35,28 +35,32 @@ export default function HomeClientView({
     <div className="-mt-16 md:mt-[-80px] relative z-10">
       
       {/* Category Toggles */}
-      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 px-4 sm:px-6 lg:px-10 xl:px-16 mb-8 mt-16 md:mt-0 relative z-20">
+      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 px-4 sm:px-6 lg:px-10 xl:px-16 mb-8 mt-16 md:mt-0 relative z-30">
         <button 
+          type="button"
           onClick={() => setMode("all")}
-          className={`px-5 py-1.5 rounded-full text-sm font-medium transition-all ${mode === "all" ? "bg-white text-black" : "bg-white/10 text-white hover:bg-white/20"}`}
+          className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${mode === "all" ? "bg-white text-black scale-105" : "bg-white/10 text-white hover:bg-white/20"}`}
         >
           All
         </button>
         <button 
+          type="button"
           onClick={() => setMode("movies")}
-          className={`px-5 py-1.5 rounded-full text-sm font-medium transition-all ${mode === "movies" ? "bg-white text-black" : "bg-white/10 text-white hover:bg-white/20"}`}
+          className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${mode === "movies" ? "bg-white text-black scale-105" : "bg-white/10 text-white hover:bg-white/20"}`}
         >
           Movies
         </button>
         <button 
+          type="button"
           onClick={() => setMode("tv")}
-          className={`px-5 py-1.5 rounded-full text-sm font-medium transition-all ${mode === "tv" ? "bg-white text-black" : "bg-white/10 text-white hover:bg-white/20"}`}
+          className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${mode === "tv" ? "bg-white text-black scale-105" : "bg-white/10 text-white hover:bg-white/20"}`}
         >
           TV Shows
         </button>
         <button 
+          type="button"
           onClick={() => setMode("anime")}
-          className={`px-5 py-1.5 rounded-full text-sm font-medium transition-all ${mode === "anime" ? "bg-white text-black" : "bg-white/10 text-white hover:bg-white/20"}`}
+          className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${mode === "anime" ? "bg-white text-black scale-105" : "bg-white/10 text-white hover:bg-white/20"}`}
         >
           Anime
         </button>

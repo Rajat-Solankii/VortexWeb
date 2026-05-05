@@ -12,8 +12,7 @@ export default function AdBanner({ dataAdSlot, className = "" }: { dataAdSlot: s
   }, []);
 
   return (
-    <div className={`w-full overflow-hidden flex items-center justify-center bg-white/5 border border-white/10 rounded-xl relative ${className}`}>
-      <span className="absolute text-xs text-white/30 tracking-widest uppercase pointer-events-none">Advertisement</span>
+    <div className={`w-full overflow-hidden flex items-center justify-center relative ${className}`}>
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}

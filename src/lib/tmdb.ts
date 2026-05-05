@@ -244,7 +244,17 @@ export async function discoverKDramas(sortBy: string = "popularity.desc", page: 
 }
 
 export async function discoverDramas(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?with_original_language=tr|zh|tl&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  const data = await fetchTMDB(`discover/tv?with_original_language=ko|tr|zh|tl&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   if (data?.results) data.results = cleanData(data.results, true);
   return data;
+}
+
+export async function getAllDramas(sortBy: string = "popularity.desc", page: number = 1) {
+  // Fetch 2 pages at once for high density
+  const [p1, p2] = await Promise.all([
+    fetchTMDB(`discover/tv?with_original_language=ko|tr|zh|tl&sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_original_language=ko|tr|zh|tl&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || [])];
+  return { results: cleanData(results, true) };
 }

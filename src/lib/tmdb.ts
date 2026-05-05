@@ -207,6 +207,24 @@ export async function discoverAnime(sortBy: string = "popularity.desc", page: nu
   return { results: cleanData(results, true) };
 }
 
+export async function discoverBollywood(sortBy: string = "popularity.desc", page: number = 1) {
+  const [p1, p2] = await Promise.all([
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || [])];
+  return { results: cleanData(results, true) };
+}
+
+export async function discoverHollywood(sortBy: string = "popularity.desc", page: number = 1) {
+  const [p1, p2] = await Promise.all([
+    fetchTMDB(`discover/movie?with_original_language=en&sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=en&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || [])];
+  return { results: cleanData(results, true) };
+}
+
 export async function getBollywoodMovies() {
   const data = await fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   return cleanData(data?.results || [], true);

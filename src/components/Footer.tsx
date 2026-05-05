@@ -19,6 +19,8 @@ export default function Footer() {
           <div className="flex flex-col gap-3">
             <h3 className="text-white font-semibold mb-1">Navigation</h3>
             <Link href="/movies" className="text-white/60 hover:text-white transition-colors">Movies</Link>
+            <Link href="/hollywood" className="text-white/60 hover:text-white transition-colors">Hollywood</Link>
+            <Link href="/bollywood" className="text-white/60 hover:text-white transition-colors">Bollywood</Link>
             <Link href="/tv" className="text-white/60 hover:text-white transition-colors">TV Shows</Link>
             <Link href="/anime" className="text-white/60 hover:text-white transition-colors">Anime</Link>
             <Link href="/genres" className="text-white/60 hover:text-white transition-colors">Genres</Link>

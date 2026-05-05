@@ -1,13 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
-import { getTVDetails, getTVRecommendations } from "@/lib/tmdb";
 import TVPlayerContainer from "@/components/TVPlayerContainer";
 import MediaRow from "@/components/MediaRow";
+import CastSection from "@/components/CastSection";
+import { getTVDetails, getTVRecommendations, getCredits } from "@/lib/tmdb";
 
 export default async function TVDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [tv, recommendations] = await Promise.all([
+  const [tv, recommendations, cast] = await Promise.all([
     getTVDetails(id),
-    getTVRecommendations(id)
+    getTVRecommendations(id),
+    getCredits("tv", id)
   ]);
 
   if (!tv) return <div className="text-white text-center py-20">TV Show not found.</div>;
@@ -39,6 +41,7 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
              
              <div className="w-full flex-1 min-w-0 max-w-6xl">
                 <TVPlayerContainer id={id} tv={tv} />
+                <CastSection cast={cast} />
              </div>
 
           </div>

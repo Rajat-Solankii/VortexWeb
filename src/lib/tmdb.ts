@@ -118,6 +118,31 @@ export async function searchMulti(query: string, includeAdult: boolean = true) {
   return cleanData(combined, false); // strict = false for search
 }
 
+export async function getKDramas() {
+  const data = await fetchTMDB(`discover/tv?with_original_language=ko&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  return cleanData(data?.results || [], true);
+}
+
+export async function getTurkishDramas() {
+  const data = await fetchTMDB(`discover/tv?with_original_language=tr&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  return cleanData(data?.results || [], true);
+}
+
+export async function getChineseDramas() {
+  const data = await fetchTMDB(`discover/tv?with_original_language=zh&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  return cleanData(data?.results || [], true);
+}
+
+export async function getPhilippineDramas() {
+  const data = await fetchTMDB(`discover/tv?with_original_language=tl&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  return cleanData(data?.results || [], true);
+}
+
+export async function getCredits(type: "movie" | "tv", id: string) {
+  const data = await fetchTMDB(`${type}/${id}/credits`);
+  return data?.cast?.slice(0, 12) || []; // Top 12 cast members
+}
+
 export async function getMovieDetails(id: string) {
   return await fetchTMDB(`movie/${id}`);
 }
@@ -127,29 +152,29 @@ export async function getTVDetails(id: string) {
 }
 
 export async function getMovieRecommendations(id: string) {
-  const data = await fetchTMDB(`movie/${id}/recommendations`);
+  const data = await fetchTMDB(`movie/${id}/recommendations?include_adult=false&${CACHE_BUST}`);
   return cleanData(data?.results || [], true);
 }
 
 export async function getTVRecommendations(id: string) {
-  const data = await fetchTMDB(`tv/${id}/recommendations`);
+  const data = await fetchTMDB(`tv/${id}/recommendations?include_adult=false&${CACHE_BUST}`);
   return cleanData(data?.results || [], true);
 }
 
 export async function discoverMovies(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   if (data?.results) data.results = cleanData(data.results, true);
   return data;
 }
 
 export async function discoverTV(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   if (data?.results) data.results = cleanData(data.results, true);
   return data;
 }
 
 export async function discoverAnime(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   if (data?.results) data.results = cleanData(data.results, true);
   return data;
 }

@@ -11,11 +11,19 @@ export default function HomeClientView({
   popularMovies,
   topRatedTV,
   anime,
+  kDramas,
+  turkishDramas,
+  chineseDramas,
+  philippineDramas,
 }: {
   trending: any[];
   popularMovies: any[];
   topRatedTV: any[];
   anime: any[];
+  kDramas: any[];
+  turkishDramas: any[];
+  chineseDramas: any[];
+  philippineDramas: any[];
 }) {
   const [mode, setMode] = useState<Mode>("all");
 
@@ -67,11 +75,27 @@ export default function HomeClientView({
         {mode === "all" && <AdsterraBanner300 />}
         
         {(mode === "all" || mode === "tv") && (
+            <MediaRow title="Heart-Racing K-Dramas" items={kDramas} />
+        )}
+
+        {(mode === "all" || mode === "tv") && (
             <MediaRow title="Top Rated TV Shows" items={topRatedTV} />
+        )}
+
+        {(mode === "all" || mode === "tv") && (
+            <MediaRow title="Turkish Delights" items={turkishDramas} />
         )}
         
         {(mode === "all" || mode === "anime") && (
             <MediaRow title="Trending Anime" items={anime} />
+        )}
+
+        {(mode === "all" || mode === "tv") && (
+            <MediaRow title="Chinese Epics" items={chineseDramas} />
+        )}
+
+        {(mode === "all" || mode === "tv") && (
+            <MediaRow title="Filipino Favorites" items={philippineDramas} />
         )}
       </div>
     </div>

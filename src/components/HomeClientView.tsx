@@ -32,10 +32,10 @@ export default function HomeClientView({
   const [mode, setMode] = useState<Mode>("all");
 
   return (
-    <div className="-mt-32 relative z-10 md:mt-[-100px]">
+    <div className="-mt-16 md:mt-[-80px] relative z-10">
       
       {/* Category Toggles */}
-      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 px-4 sm:px-6 lg:px-10 xl:px-16 mb-8 mt-12 md:mt-0 relative z-20">
+      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 px-4 sm:px-6 lg:px-10 xl:px-16 mb-8 mt-16 md:mt-0 relative z-20">
         <button 
           onClick={() => setMode("all")}
           className={`px-5 py-1.5 rounded-full text-sm font-medium transition-all ${mode === "all" ? "bg-white text-black" : "bg-white/10 text-white hover:bg-white/20"}`}

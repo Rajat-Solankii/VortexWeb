@@ -30,7 +30,13 @@ export default function EpisodeSelector({ tvId, seasons, onSelect }: { tvId: str
       setLoading(true);
       try {
         const data = await getTVSeason(tvId, selectedSeason);
-        setEpisodes(data?.episodes || []);
+        const allEpisodes = data?.episodes || [];
+        
+        // Only show episodes that have already aired
+        const now = new Date().toISOString().split('T')[0];
+        const releasedEpisodes = allEpisodes.filter((ep: Episode) => ep.air_date && ep.air_date <= now);
+        
+        setEpisodes(releasedEpisodes);
       } catch (error) {
         console.error("Failed to load episodes", error);
       } finally {

@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import VideoPlayer from "./VideoPlayer";
 import EpisodeSelector from "./EpisodeSelector";
 import HistoryTracker from "./HistoryTracker";
 import DownloadMediaButton from "./DownloadMediaButton";
 
-export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
+function TVPlayerContent({ id, tv }: { id: string, tv: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -14,11 +14,9 @@ export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
   const validSeasons = seasons?.filter((s: any) => s.season_number > 0) || [];
   const initialSeason = validSeasons.length > 0 ? validSeasons[0].season_number : 1;
   
-  // Initialize state from URL or defaults
   const [season, setSeason] = useState(initialSeason);
   const [episode, setEpisode] = useState(1);
 
-  // Sync state with URL changes (handles Back button)
   useEffect(() => {
     const s = searchParams.get("s");
     const e = searchParams.get("e");
@@ -28,7 +26,6 @@ export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
   }, [searchParams]);
 
   const handleEpisodeSelect = (s: number, e: number) => {
-    // Update URL to create a history entry
     router.push(`/tv/${id}?s=${s}&e=${e}`, { scroll: false });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -50,5 +47,13 @@ export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
          onSelect={handleEpisodeSelect} 
       />
     </div>
+  );
+}
+
+export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
+  return (
+    <Suspense fallback={<div className="w-full aspect-video bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-gray-500">Loading Player...</div>}>
+      <TVPlayerContent id={id} tv={tv} />
+    </Suspense>
   );
 }

@@ -9,20 +9,27 @@ export default function AdBlockWall() {
     setIsClient(true);
     
     const checkAdBlock = async () => {
-      // Bait URL that uBlock and others always block
-      const baitUrl = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+      // 1. Element-based check (Bait div)
+      const bait = document.createElement("div");
+      bait.innerHTML = "&nbsp;";
+      bait.className = "pub_300x250 pub_728x90 text-ad textAd adsbox ad-unit ad-layer ads-container banner-ad";
+      bait.setAttribute("style", "width: 1px; height: 1px; position: absolute; left: -10000px; top: -1000px;");
+      document.body.appendChild(bait);
       
+      const isElementBlocked = window.getComputedStyle(bait).getPropertyValue("display") === "none" || 
+                               bait.offsetHeight === 0;
+
+      // 2. Fetch-based check (Bait URL)
+      let isFetchBlocked = false;
       try {
-        const response = await fetch(new Request(baitUrl), {
-          method: "HEAD",
-          mode: "no-cors",
-        });
-        // If it reaches here, it might not be blocked, but no-cors makes it tricky
-        setIsAdBlockActive(false);
+        const baitUrl = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+        await fetch(new Request(baitUrl), { method: "HEAD", mode: "no-cors" });
       } catch (error) {
-        // If fetch fails, it's almost certainly an AdBlocker
-        setIsAdBlockActive(true);
+        isFetchBlocked = true;
       }
+
+      setIsAdBlockActive(isElementBlocked || isFetchBlocked);
+      document.body.removeChild(bait);
     };
 
     // Run check after a short delay to let blockers initialize

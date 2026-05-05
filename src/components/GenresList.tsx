@@ -7,7 +7,6 @@ interface Genre {
 
 export default function GenresList({ movieGenres, tvGenres }: { movieGenres: Genre[], tvGenres: Genre[] }) {
   return (
-  return (
     <div className="space-y-12">
       <div>
         <h2 className="text-2xl font-bold text-white mb-6 flex items-center">

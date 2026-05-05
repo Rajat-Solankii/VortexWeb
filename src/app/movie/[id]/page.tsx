@@ -39,7 +39,7 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
                 <p className="text-gray-300 text-sm md:text-base leading-relaxed drop-shadow-sm">{movie.overview}</p>
              </div>
              
-             <div className="w-full flex-1 min-w-0 flex flex-col justify-start">
+             <div className="w-full flex-1 min-w-0 flex flex-col justify-start max-w-6xl">
                 <h2 className="text-2xl font-bold text-white mb-4">Watch Now</h2>
                 <VideoPlayer type="movie" id={id} />
 

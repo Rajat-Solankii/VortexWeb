@@ -37,7 +37,7 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
                 <p className="text-gray-300 text-sm md:text-base leading-relaxed drop-shadow-sm">{tv.overview}</p>
              </div>
              
-             <div className="w-full flex-1 min-w-0">
+             <div className="w-full flex-1 min-w-0 max-w-6xl">
                 <TVPlayerContainer id={id} tv={tv} />
              </div>
 

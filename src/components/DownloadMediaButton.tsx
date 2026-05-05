@@ -15,9 +15,9 @@ export default function DownloadMediaButton({ type, id, season, episode, title }
     // Example: https://download-service.com/get?id=123&type=movie
     let downloadUrl = "";
     if (type === "movie") {
-      downloadUrl = `https://vidsrc.me/download/movie?tmdb=${id}`;
+      downloadUrl = `https://player.videasy.net/download/movie/${id}`;
     } else {
-      downloadUrl = `https://vidsrc.me/download/tv?tmdb=${id}&sea=${season}&epi=${episode}`;
+      downloadUrl = `https://player.videasy.net/download/tv/${id}/${season}/${episode}`;
     }
     
     window.open(downloadUrl, "_blank");

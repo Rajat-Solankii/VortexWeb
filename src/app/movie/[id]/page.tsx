@@ -24,7 +24,7 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
           </div>
           
           <div className="flex flex-col lg:flex-row gap-8 mt-8">
-             <div className="w-full lg:w-[280px] xl:w-[350px] flex-shrink-0 flex flex-col items-center lg:items-start">
+             <div className="w-full lg:w-[300px] xl:w-[350px] flex-shrink-0 flex flex-col items-center lg:items-start">
                 <img src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} className="w-64 lg:w-full rounded-xl shadow-[0_0_30px_rgba(124,77,255,0.4)]" />
                 <h1 className="text-3xl lg:text-4xl font-bold text-white mt-6 mb-2 text-center lg:text-left drop-shadow-md">{movie.title}</h1>
                 <div className="flex items-center space-x-4 text-sm text-gray-400 mb-4">
@@ -40,7 +40,7 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
                 <p className="text-gray-300 text-sm md:text-base leading-relaxed drop-shadow-sm">{movie.overview}</p>
              </div>
              
-             <div className="w-full flex-1 min-w-0 flex flex-col justify-start">
+             <div className="w-full flex-1 min-w-0 flex flex-col justify-start max-w-5xl">
                 <h2 className="text-2xl font-bold text-white mb-4">Watch Now</h2>
                 <VideoPlayer type="movie" id={id} />
 

@@ -3,6 +3,7 @@ import { getMovieDetails, getMovieRecommendations } from "@/lib/tmdb";
 import VideoPlayer from "@/components/VideoPlayer";
 import MediaRow from "@/components/MediaRow";
 import HistoryTracker from "@/components/HistoryTracker";
+import DownloadMediaButton from "@/components/DownloadMediaButton";
 
 export default async function MovieDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -40,7 +41,10 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
              </div>
              
              <div className="w-full flex-1 min-w-0 flex flex-col justify-start max-w-6xl">
-                <h2 className="text-2xl font-bold text-white mb-4">Watch Now</h2>
+                <div className="flex items-center justify-between mb-4">
+                   <h2 className="text-2xl font-bold text-white">Watch Now</h2>
+                   <DownloadMediaButton type="movie" id={id} title={movie.title} />
+                </div>
                 <VideoPlayer type="movie" id={id} />
 
              </div>

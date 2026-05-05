@@ -3,6 +3,7 @@ import { useState } from "react";
 import VideoPlayer from "./VideoPlayer";
 import EpisodeSelector from "./EpisodeSelector";
 import HistoryTracker from "./HistoryTracker";
+import DownloadMediaButton from "./DownloadMediaButton";
 
 export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
   const seasons = tv?.seasons || [];
@@ -14,9 +15,12 @@ export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
   return (
     <div className="w-full flex flex-col justify-start">
       <HistoryTracker item={{ ...tv, media_type: 'tv' }} season={season} episode={episode} />
-      <h2 className="text-2xl font-bold text-white mb-4">
-        Watch S{season} E{episode}
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-white">
+          Watch S{season} E{episode}
+        </h2>
+        <DownloadMediaButton type="tv" id={id} season={season} episode={episode} title={tv.name} />
+      </div>
       <VideoPlayer type="tv" id={id} season={season} episode={episode} />
       
 

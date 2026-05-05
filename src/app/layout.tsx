@@ -38,6 +38,11 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2781750854299489"
           crossOrigin="anonymous"
         />
+        {/* Adsterra Social Bar */}
+        <script 
+          type='text/javascript' 
+          src='https://pl29341352.profitablecpmratenetwork.com/78/bc/89/78bc896d2b5f195d7bb698d8e24e8c18.js'
+        />
       </head>
       <body className="min-h-full flex flex-col bg-black">
         <Navbar />

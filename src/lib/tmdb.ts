@@ -1,4 +1,5 @@
 const BASE_URL = "https://vortex-proxy-six.vercel.app/api/tmdb";
+const WITHOUT_ADULT_KEYWORDS = "12113,190370,181827,12053,155455,155456"; // Nudity, Erotica, Sexual Content, Porn, Ecchi, Hentai
 
 export interface TMDBItem {
   id: number;
@@ -57,12 +58,15 @@ export function cleanData(items: TMDBItem[]): TMDBItem[] {
   const ADULT_KEYWORDS = [
     "hentai", "ecchi", "erotica", "sexual content", "nudity", 
     "uncensored", "sexual", "sex", "adult animation", "porn",
-    "harem", "bikini", "lingerie", "hot scenes", "romance sex"
+    "harem", "bikini", "lingerie", "hot scenes", "romance sex",
+    "joshiochi", "sweet punishment", "overflow", "redo of healer"
   ];
 
   const ADULT_TITLES = [
     "overflow", "sweet punishment", "redo of healer", "yosuga no sora",
-    "high school dxd", "shimoneta", "prison school"
+    "high school dxd", "shimoneta", "prison school", "joshiochi",
+    "my wife is the student council president", "kiss x sis", 
+    "monster musume", "to love ru", "testament of sister new devil"
   ];
 
   return items.filter(item => {
@@ -85,22 +89,22 @@ export function cleanData(items: TMDBItem[]): TMDBItem[] {
 }
 
 export async function getTrending() {
-  const data = await fetchTMDB("trending/all/week?include_adult=false");
+  const data = await fetchTMDB(`trending/all/week?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
   return cleanData(data?.results || []);
 }
 
 export async function getPopularMovies() {
-  const data = await fetchTMDB("movie/popular?include_adult=false");
+  const data = await fetchTMDB(`movie/popular?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
   return cleanData(data?.results || []);
 }
 
 export async function getTopRatedTVShows() {
-  const data = await fetchTMDB("tv/top_rated?include_adult=false");
+  const data = await fetchTMDB(`tv/top_rated?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
   return cleanData(data?.results || []);
 }
 
 export async function getTrendingAnime() {
-  const data = await fetchTMDB("discover/tv?with_keywords=210024&sort_by=popularity.desc&include_adult=false");
+  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
   return cleanData(data?.results || []);
 }
 
@@ -124,29 +128,29 @@ export async function getTVDetails(id: string) {
 }
 
 export async function getMovieRecommendations(id: string) {
-  const data = await fetchTMDB(`movie/${id}/recommendations`);
+  const data = await fetchTMDB(`movie/${id}/recommendations?include_adult=false`);
   return cleanData(data?.results || []);
 }
 
 export async function getTVRecommendations(id: string) {
-  const data = await fetchTMDB(`tv/${id}/recommendations`);
+  const data = await fetchTMDB(`tv/${id}/recommendations?include_adult=false`);
   return cleanData(data?.results || []);
 }
 
 export async function discoverMovies(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page}&include_adult=false`);
+  const data = await fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
   if (data?.results) data.results = cleanData(data.results);
   return data;
 }
 
 export async function discoverTV(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page}&include_adult=false`);
+  const data = await fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
   if (data?.results) data.results = cleanData(data.results);
   return data;
 }
 
 export async function discoverAnime(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page}&include_adult=false`);
+  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
   if (data?.results) data.results = cleanData(data.results);
   return data;
 }

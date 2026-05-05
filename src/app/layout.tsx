@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
@@ -32,12 +31,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        {/* Google AdSense Global Script */}
-        <Script
+        {/* Google AdSense Global Script - plain tag for crawler visibility */}
+        <script
           async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2781750854299489`}
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2781750854299489"
           crossOrigin="anonymous"
-          strategy="lazyOnload"
         />
       </head>
       <body className="min-h-full flex flex-col">

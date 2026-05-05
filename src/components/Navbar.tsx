@@ -31,6 +31,8 @@ export default function Navbar() {
                 <Link href="/movies" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Movies</Link>
                 <Link href="/tv" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">TV Shows</Link>
                 <Link href="/anime" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Anime</Link>
+                <Link href="/kdrama" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">K-Drama</Link>
+                <Link href="/dramas" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Global Dramas</Link>
               </div>
             </div>
           </div>
@@ -77,6 +79,8 @@ export default function Navbar() {
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/movies" className="text-gray-300 hover:text-white font-medium">Movies</Link>
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/tv" className="text-gray-300 hover:text-white font-medium">TV Shows</Link>
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/anime" className="text-gray-300 hover:text-white font-medium">Anime</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/kdrama" className="text-gray-300 hover:text-white font-medium">K-Drama</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/dramas" className="text-gray-300 hover:text-white font-medium">Global Dramas</Link>
             </div>
         </div>
       )}

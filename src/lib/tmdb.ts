@@ -178,3 +178,15 @@ export async function discoverAnime(sortBy: string = "popularity.desc", page: nu
   if (data?.results) data.results = cleanData(data.results, true);
   return data;
 }
+
+export async function discoverKDramas(sortBy: string = "popularity.desc", page: number = 1) {
+  const data = await fetchTMDB(`discover/tv?with_original_language=ko&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  if (data?.results) data.results = cleanData(data.results, true);
+  return data;
+}
+
+export async function discoverDramas(sortBy: string = "popularity.desc", page: number = 1) {
+  const data = await fetchTMDB(`discover/tv?with_original_language=tr|zh|tl&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  if (data?.results) data.results = cleanData(data.results, true);
+  return data;
+}

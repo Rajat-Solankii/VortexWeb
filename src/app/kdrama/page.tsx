@@ -6,8 +6,14 @@ export default async function KDramaPage({ searchParams }: { searchParams: Promi
   const { sort, page } = await searchParams;
   const sortBy = sort || "popularity.desc";
   const currentPage = parseInt(page || "1", 10);
-  const data = await discoverKDramas(sortBy, currentPage);
-  const results = data?.results || [];
+  
+  // Fetch 2 pages at once to fill the screen better
+  const [page1, page2] = await Promise.all([
+    discoverKDramas(sortBy, currentPage * 2 - 1),
+    discoverKDramas(sortBy, currentPage * 2)
+  ]);
+  
+  const results = [...(page1?.results || []), ...(page2?.results || [])];
 
   return (
     <div className="w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-12">

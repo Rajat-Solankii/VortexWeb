@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AdsterraBanner728 from "@/components/AdsterraBanner728";
 
 export default function RootLayout({
   children,
@@ -54,6 +55,9 @@ export default function RootLayout({
         <main className="flex-grow pt-16">
           {children}
         </main>
+        <div className="px-4 sm:px-6 lg:px-10 xl:px-16">
+          <AdsterraBanner728 />
+        </div>
         <Footer />
         <Analytics />
       </body>

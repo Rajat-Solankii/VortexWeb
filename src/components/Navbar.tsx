@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Search, Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import DownloadAppButton from "./DownloadAppButton";
-import SafeSearchToggle from "./SafeSearchToggle";
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
@@ -48,11 +47,9 @@ export default function Navbar() {
                 className="bg-white/5 border border-white/10 text-white text-sm rounded-full focus:ring-vortex-purple focus:border-vortex-purple block w-64 pl-10 p-2 transition-all placeholder-gray-400 focus:bg-white/10"
               />
             </form>
-            <SafeSearchToggle />
             <DownloadAppButton />
           </div>
           <div className="md:hidden flex items-center gap-3">
-             <div className="scale-90"><SafeSearchToggle /></div>
              <div className="scale-90"><DownloadAppButton /></div>
              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-300 hover:text-white">
                {isMobileMenuOpen ? <X /> : <Menu />}

@@ -56,7 +56,8 @@ export function cleanData(items: TMDBItem[]): TMDBItem[] {
 
   const ADULT_KEYWORDS = [
     "hentai", "ecchi", "erotica", "sexual content", "nudity", 
-    "uncensored", "sexual", "sex", "adult animation", "porn"
+    "uncensored", "sexual", "sex", "adult animation", "porn",
+    "harem", "bikini", "lingerie", "hot scenes", "romance sex"
   ];
 
   const ADULT_TITLES = [
@@ -104,7 +105,8 @@ export async function getTrendingAnime() {
 }
 
 export async function searchMulti(query: string, includeAdult: boolean = false) {
-  const adultFlag = includeAdult ? "true" : "false";
+  // Always force safe search for global compliance
+  const adultFlag = "false";
   const [page1, page2] = await Promise.all([
     fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=1&include_adult=${adultFlag}`),
     fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=2&include_adult=${adultFlag}`)

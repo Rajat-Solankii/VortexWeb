@@ -6,8 +6,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const { q } = await searchParams;
   const query = q || "";
   const cookieStore = await cookies();
-  const safeSearch = cookieStore.get("safeSearch")?.value !== "false";
-  const results = query ? await searchMulti(query, !safeSearch) : [];
+  // Force safe search regardless of cookie for global filtering
+  const results = query ? await searchMulti(query, false) : [];
 
   return (
     <div className="w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-12">

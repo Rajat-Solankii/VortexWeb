@@ -1,16 +1,37 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import VideoPlayer from "./VideoPlayer";
 import EpisodeSelector from "./EpisodeSelector";
 import HistoryTracker from "./HistoryTracker";
 import DownloadMediaButton from "./DownloadMediaButton";
 
 export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const seasons = tv?.seasons || [];
   const validSeasons = seasons?.filter((s: any) => s.season_number > 0) || [];
   const initialSeason = validSeasons.length > 0 ? validSeasons[0].season_number : 1;
+  
+  // Initialize state from URL or defaults
   const [season, setSeason] = useState(initialSeason);
   const [episode, setEpisode] = useState(1);
+
+  // Sync state with URL changes (handles Back button)
+  useEffect(() => {
+    const s = searchParams.get("s");
+    const e = searchParams.get("e");
+    
+    if (s) setSeason(parseInt(s, 10));
+    if (e) setEpisode(parseInt(e, 10));
+  }, [searchParams]);
+
+  const handleEpisodeSelect = (s: number, e: number) => {
+    // Update URL to create a history entry
+    router.push(`/tv/${id}?s=${s}&e=${e}`, { scroll: false });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="w-full flex flex-col justify-start">
@@ -23,16 +44,10 @@ export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
       </div>
       <VideoPlayer type="tv" id={id} season={season} episode={episode} title={tv.name} />
       
-
-
       <EpisodeSelector 
          tvId={id}
          seasons={seasons} 
-         onSelect={(s, e) => {
-            setSeason(s);
-            setEpisode(e);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-         }} 
+         onSelect={handleEpisodeSelect} 
       />
     </div>
   );

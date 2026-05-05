@@ -28,10 +28,11 @@ export default function AdsterraBanner728() {
   }, []);
 
   return (
-    <div className="flex justify-center my-8 w-full overflow-hidden">
+    <div className="flex flex-col items-center gap-2 my-8 w-full overflow-hidden">
+      <span className="text-[10px] uppercase tracking-widest text-white/20 font-medium">Advertisement</span>
       <div 
         ref={bannerRef} 
-        className="min-h-[90px] w-full max-w-[728px]"
+        className="min-h-[90px] w-full max-w-[728px] bg-white/5 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden"
       />
     </div>
   );

@@ -21,7 +21,6 @@ export const metadata: Metadata = {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdsterraBanner728 from "@/components/AdsterraBanner728";
-import AdBlockWall from "@/components/AdBlockWall";
 
 export default function RootLayout({
   children,
@@ -61,7 +60,6 @@ export default function RootLayout({
         </div>
         <Footer />
         <Analytics />
-        <AdBlockWall />
       </body>
     </html>
   );

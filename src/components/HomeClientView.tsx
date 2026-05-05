@@ -22,16 +22,6 @@ export default function HomeClientView({
   return (
     <div className="-mt-32 relative z-10 md:mt-[-100px]">
       
-      {/* AdBlock / Support Message */}
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-16 mb-8 relative z-20">
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 md:p-5 backdrop-blur-sm">
-          <p className="text-white/60 text-sm md:text-base font-medium leading-relaxed">
-            <span className="text-blue-500 font-bold mr-2">💡 Support Vortex:</span> 
-            Our platform is free to use. Please consider disabling your ad-blocker to help us maintain the website and keep the streaming quality high for everyone.
-          </p>
-        </div>
-      </div>
-      
       {/* Category Toggles */}
       <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 px-4 sm:px-6 lg:px-10 xl:px-16 mb-8 mt-12 md:mt-0 relative z-20">
         <button 

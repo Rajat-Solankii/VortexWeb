@@ -3,7 +3,15 @@ import { TMDBItem } from "@/lib/tmdb";
 import MediaCard from "./MediaCard";
 import { useRef, useState, useEffect } from "react";
 
-export default function MediaRow({ title, items }: { title: string; items: TMDBItem[] }) {
+export default function MediaRow({ 
+  title, 
+  items, 
+  action 
+}: { 
+  title: string; 
+  items: TMDBItem[]; 
+  action?: React.ReactNode;
+}) {
   const rowRef = useRef<HTMLDivElement>(null);
   const [isMoved, setIsMoved] = useState(false);
 
@@ -27,10 +35,13 @@ export default function MediaRow({ title, items }: { title: string; items: TMDBI
   
   return (
     <div className="py-6 md:py-8 group/row relative">
-      <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 px-4 sm:px-6 lg:px-10 xl:px-16 text-white tracking-wide flex items-center space-x-3">
-          <span className="w-1.5 h-6 bg-vortex-blue rounded-full drop-shadow-[0_0_5px_rgba(0,176,255,0.8)]"></span>
-          <span>{title}</span>
-      </h2>
+      <div className="flex items-center justify-between px-4 sm:px-6 lg:px-10 xl:px-16 mb-4 md:mb-6">
+        <h2 className="text-xl md:text-2xl font-bold text-white tracking-wide flex items-center space-x-3">
+            <span className="w-1.5 h-6 bg-vortex-blue rounded-full drop-shadow-[0_0_5px_rgba(0,176,255,0.8)]"></span>
+            <span>{title}</span>
+        </h2>
+        {action}
+      </div>
       
       <div className="relative px-4 sm:px-6 lg:px-10 xl:px-16">
         {/* Left Arrow */}

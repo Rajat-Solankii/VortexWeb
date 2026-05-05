@@ -38,7 +38,7 @@ export default function MediaCard({ item, onRemove }: { item: TMDBItem, onRemove
             e.stopPropagation();
             onRemove(item.id);
           }}
-          className="absolute -top-2 -right-2 z-50 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110 md:opacity-0 md:group-hover:opacity-100"
+          className="absolute top-2 right-2 z-50 w-7 h-7 bg-red-500/90 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg backdrop-blur-md transition-transform hover:scale-110 md:opacity-0 md:group-hover:opacity-100"
           title="Remove from history"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4">

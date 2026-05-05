@@ -16,17 +16,17 @@ export default function EpisodeSelector({ seasons, onSelect }: { seasons: Season
 
   return (
     <div className="xl:mt-0 mt-8 space-y-6 bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
-      <h3 className="text-xl font-bold text-white flex items-center space-x-3">
-         <span className="w-1 h-5 bg-vortex-purple rounded-full shadow-[0_0_10px_rgba(124,77,255,0.8)]"></span>
+      <h3 className="text-2xl font-bold text-white flex items-center space-x-3">
+         <span className="w-1.5 h-6 bg-vortex-purple rounded-full shadow-[0_0_10px_rgba(124,77,255,0.8)]"></span>
          <span>Episodes</span>
       </h3>
 
-      <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
          {validSeasons.map(s => (
            <button
              key={s.season_number}
              onClick={() => setSelectedSeason(s.season_number)}
-             className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all border ${selectedSeason === s.season_number ? 'bg-vortex-purple/20 border-vortex-purple text-vortex-purple shadow-[0_0_15px_rgba(124,77,255,0.2)]' : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10'}`}
+             className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${selectedSeason === s.season_number ? 'bg-vortex-purple text-white shadow-[0_0_15px_rgba(124,77,255,0.5)]' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
            >
              {s.name}
            </button>

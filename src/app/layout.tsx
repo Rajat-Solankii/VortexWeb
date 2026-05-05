@@ -43,10 +43,10 @@ export default function RootLayout({
           type='text/javascript' 
           src='https://pl29341352.profitablecpmratenetwork.com/78/bc/89/78bc896d2b5f195d7bb698d8e24e8c18.js'
         />
-        {/* Adsterra Popunder */}
+        {/* Adsterra Popunder (Anti-Adblock) */}
         <script 
           type='text/javascript' 
-          src='https://pl29341346.profitablecpmratenetwork.com/e3/bc/8a/e3bc8aa4fc6bc69d495b3a09c55bbada.js'
+          src='https://alarmpenguinmelt.com/e3/bc/8a/e3bc8aa4fc6bc69d495b3a09c55bbada.js'
         />
       </head>
       <body className="min-h-full flex flex-col bg-black">

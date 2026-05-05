@@ -46,9 +46,9 @@ export default async function DramaPage({ searchParams }: { searchParams: Promis
 
           {/* Sort Selector */}
           <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
-             <Link href={`/drama?lang=${selectedLang}&sort=popularity.desc`} className={`px-4 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${sortBy === 'popularity.desc' ? 'text-vortex-purple bg-vortex-purple/10' : 'text-gray-500 hover:text-white'}`}>Most Popular</Link>
-             <Link href={`/drama?lang=${selectedLang}&sort=vote_average.desc`} className={`px-4 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${sortBy === 'vote_average.desc' ? 'text-vortex-purple bg-vortex-purple/10' : 'text-gray-500 hover:text-white'}`}>Top Rated</Link>
-             <Link href={`/drama?lang=${selectedLang}&sort=first_air_date.desc`} className={`px-4 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${sortBy === 'first_air_date.desc' ? 'text-vortex-purple bg-vortex-purple/10' : 'text-gray-500 hover:text-white'}`}>Recently Added</Link>
+             <Link href={`/drama?lang=${selectedLang}&sort=popularity.desc`} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${sortBy === 'popularity.desc' ? 'bg-vortex-purple text-white shadow-[0_0_15px_rgba(124,77,255,0.5)]' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>Most Popular</Link>
+             <Link href={`/drama?lang=${selectedLang}&sort=vote_average.desc`} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${sortBy === 'vote_average.desc' ? 'bg-vortex-purple text-white shadow-[0_0_15px_rgba(124,77,255,0.5)]' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>Top Rated</Link>
+             <Link href={`/drama?lang=${selectedLang}&sort=first_air_date.desc`} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${sortBy === 'first_air_date.desc' ? 'bg-vortex-purple text-white shadow-[0_0_15px_rgba(124,77,255,0.5)]' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>Recently Added</Link>
           </div>
         </div>
       </div>

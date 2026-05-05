@@ -2,8 +2,7 @@
 import TVPlayerContainer from "@/components/TVPlayerContainer";
 import MediaRow from "@/components/MediaRow";
 import CastSection from "@/components/CastSection";
-import TrailerPlayer from "@/components/TrailerPlayer";
-import { getTVDetails, getTVRecommendations, getCredits, getVideos } from "@/lib/tmdb";
+import BackButton from "@/components/BackButton";
 
 export default async function TVDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -22,6 +21,9 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
   return (
     <div>
        <div className="relative w-full min-h-screen pb-12 pt-8 px-4 sm:px-6 lg:px-10 xl:px-16 mx-auto">
+          <div className="mb-6 flex items-center">
+             <BackButton />
+          </div>
           <div className="absolute inset-0 z-[-1] opacity-20">
              <img src={`https://image.tmdb.org/t/p/original${tv.backdrop_path}`} alt="" className="w-full h-full object-cover" />
              <div className="absolute inset-0 bg-gradient-to-t from-vortex-black via-vortex-black/80 to-vortex-black/20"></div>

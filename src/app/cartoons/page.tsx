@@ -10,6 +10,8 @@ const COUNTRIES = [
   { label: "China", value: "zh" },
 ];
 
+import BackButton from "@/components/BackButton";
+
 export default async function CartoonsPage({ searchParams }: { searchParams: Promise<{ sort?: string, page?: string, lang?: string }> }) {
   const { sort, page, lang } = await searchParams;
   const sortBy = sort || "popularity.desc";
@@ -21,6 +23,9 @@ export default async function CartoonsPage({ searchParams }: { searchParams: Pro
 
   return (
     <div className="w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-12">
+      <div className="mb-8">
+         <BackButton />
+      </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-8">
         <div>
           <h1 className="text-4xl font-bold text-white flex items-center space-x-3 mb-2">

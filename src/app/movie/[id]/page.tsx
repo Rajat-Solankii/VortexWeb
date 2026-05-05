@@ -2,6 +2,8 @@
 import HistoryTracker from "@/components/HistoryTracker";
 import DownloadMediaButton from "@/components/DownloadMediaButton";
 import CastSection from "@/components/CastSection";
+import VideoPlayer from "@/components/VideoPlayer";
+import MediaRow from "@/components/MediaRow";
 import { getMovieDetails, getMovieRecommendations, getCredits } from "@/lib/tmdb";
 
 export default async function MovieDetailsPage({ params }: { params: Promise<{ id: string }> }) {

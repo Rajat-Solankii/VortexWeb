@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Search, Play } from "lucide-react";
+import { Search, Play, Info } from "lucide-react";
 
 export default function VideoPlayer({ type, id, season, episode, title }: { type: "movie" | "tv", id: string, season?: number, episode?: number, title?: string }) {
   const [server, setServer] = useState(1);
@@ -28,8 +28,8 @@ export default function VideoPlayer({ type, id, season, episode, title }: { type
                     <Play className="h-10 w-10 text-white fill-white ml-1" />
                 </div>
                 <div>
-                    <h3 className="text-xl font-bold text-white mb-2">Watch on YouTube</h3>
-                    <p className="text-gray-400 text-sm max-w-sm">Direct embedding is restricted for this content. Tap below to find the full episode on YouTube.</p>
+                    <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">Watch on YouTube</h3>
+                    <p className="text-gray-300 text-sm max-w-sm">Direct embedding is restricted for this content. Tap below to find the full episode on YouTube.</p>
                 </div>
                 <a 
                     href={`https://www.youtube.com/results?search_query=${youtubeQuery}`}
@@ -52,29 +52,29 @@ export default function VideoPlayer({ type, id, season, episode, title }: { type
       </div>
 
       {/* Server Switcher */}
-      <div className="py-4 border-t border-white/5">
+      <div className="py-4 border-t border-white/10">
          <div className="flex flex-col">
             <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] font-black text-vortex-purple uppercase tracking-[0.2em]">Playback Engines</span>
-                <span className="text-[9px] text-gray-500 uppercase">3 Optimized Servers Active</span>
+                <span className="text-[10px] font-black text-vortex-purple uppercase tracking-[0.3em] drop-shadow-sm">Playback Engines</span>
+                <span className="text-[10px] font-bold text-white/80 uppercase tracking-wider">3 Optimized Servers Active</span>
             </div>
             
             <div className="grid grid-cols-3 gap-3">
                 <button 
                     onClick={() => setServer(1)}
-                    className={`py-3 rounded-xl text-[11px] font-bold transition-all border ${server === 1 ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]' : 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10'}`}
+                    className={`py-3.5 rounded-xl text-[11px] font-black transition-all border ${server === 1 ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.3)] scale-[1.02]' : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 hover:text-white'}`}
                 >
                     SERVER 1
                 </button>
                 <button 
                     onClick={() => setServer(2)}
-                    className={`py-3 rounded-xl text-[11px] font-bold transition-all border ${server === 2 ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]' : 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10'}`}
+                    className={`py-3.5 rounded-xl text-[11px] font-black transition-all border ${server === 2 ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.3)] scale-[1.02]' : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 hover:text-white'}`}
                 >
                     SERVER 2
                 </button>
                 <button 
                     onClick={() => setServer(3)}
-                    className={`py-3 rounded-xl text-[11px] font-bold transition-all border ${server === 3 ? 'bg-red-600 text-white border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.4)]' : 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10'}`}
+                    className={`py-3.5 rounded-xl text-[11px] font-black transition-all border ${server === 3 ? 'bg-red-600 text-white border-red-600 shadow-[0_0_25px_rgba(220,38,38,0.5)] scale-[1.02]' : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 hover:text-white'}`}
                 >
                     YOUTUBE
                 </button>
@@ -82,9 +82,15 @@ export default function VideoPlayer({ type, id, season, episode, title }: { type
          </div>
       </div>
       
-      <div className="flex items-center space-x-2 text-[10px] text-gray-500 italic px-1">
-        <span className="w-1 h-1 rounded-full bg-gray-600"></span>
-        <p>Switch to <span className="text-gray-300">Server 2</span> if Server 1 is slow. Use <span className="text-red-500 font-bold">YouTube</span> for regional cartoons.</p>
+      {/* High-Visibility Tip Box */}
+      <div className="flex items-start space-x-3 p-4 bg-white/5 rounded-2xl border border-white/10 shadow-inner group">
+        <div className="mt-0.5">
+           <Info className="h-4 w-4 text-vortex-purple" />
+        </div>
+        <p className="text-[11px] text-gray-200 leading-relaxed">
+            <span className="text-white font-bold uppercase tracking-wider mr-1">Pro Tip:</span>
+            Switch to <span className="text-white font-black underline decoration-vortex-purple underline-offset-2">Server 2</span> if Server 1 is slow. Use <span className="text-red-500 font-black">YouTube</span> for regional cartoons like Motu Patlu.
+        </p>
       </div>
     </div>
   );

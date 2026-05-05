@@ -2,6 +2,7 @@
 import { useState } from "react";
 import MediaRow from "@/components/MediaRow";
 import RecentlyPlayedRow from "@/components/RecentlyPlayedRow";
+import AdsterraBanner300 from "@/components/AdsterraBanner300";
 
 type Mode = "all" | "movies" | "tv" | "anime";
 
@@ -62,6 +63,8 @@ export default function HomeClientView({
         {(mode === "all" || mode === "movies") && (
             <MediaRow title="Popular Movies" items={popularMovies} />
         )}
+        
+        {mode === "all" && <AdsterraBanner300 />}
         
         {(mode === "all" || mode === "tv") && (
             <MediaRow title="Top Rated TV Shows" items={topRatedTV} />

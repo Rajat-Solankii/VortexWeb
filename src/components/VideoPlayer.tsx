@@ -23,21 +23,21 @@ export default function VideoPlayer({ type, id, season, episode, title }: { type
       {/* Video Container */}
       <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(124,77,255,0.15)] border border-white/10 relative">
         {server === 3 ? (
-            <div className="w-full h-full bg-gradient-to-br from-red-900/20 via-black to-black flex flex-col items-center justify-center p-8 text-center space-y-6">
-                <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(220,38,38,0.5)]">
-                    <Play className="h-10 w-10 text-white fill-white ml-1" />
+            <div className="w-full h-full bg-gradient-to-br from-red-900/20 via-black to-black flex flex-col items-center justify-center p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
+                <div className="w-12 h-12 sm:w-20 sm:h-20 bg-red-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(220,38,38,0.5)]">
+                    <Play className="h-6 w-6 sm:h-10 sm:w-10 text-white fill-white ml-0.5 sm:ml-1" />
                 </div>
                 <div>
-                    <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">Watch on YouTube</h3>
-                    <p className="text-gray-300 text-sm max-w-sm">Direct embedding is restricted for this content. Tap below to find the full episode on YouTube.</p>
+                    <h3 className="text-lg sm:text-xl font-bold text-white mb-1 sm:mb-2 uppercase tracking-tight">Watch on YouTube</h3>
+                    <p className="text-gray-400 sm:text-gray-300 text-[10px] sm:text-sm max-w-sm px-2">Direct embedding is restricted for this content. Tap below to find the full episode on YouTube.</p>
                 </div>
                 <a 
                     href={`https://www.youtube.com/results?search_query=${youtubeQuery}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-3 px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl transition-all shadow-xl uppercase tracking-widest text-xs"
+                    className="flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl transition-all shadow-xl uppercase tracking-widest text-[10px] sm:text-xs"
                 >
-                    <Search className="h-4 w-4" />
+                    <Search className="h-3.5 w-3.5 sm:h-4 w-4" />
                     <span>Search YouTube</span>
                 </a>
             </div>

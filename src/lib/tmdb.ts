@@ -1,5 +1,6 @@
 const BASE_URL = "https://vortex-proxy-six.vercel.app/api/tmdb";
-const WITHOUT_ADULT_KEYWORDS = "12113,190370,181827,12053,155455,155456"; // Nudity, Erotica, Sexual Content, Porn, Ecchi, Hentai
+const WITHOUT_ADULT_KEYWORDS = "12113,190370,181827,12053,155455,155456,155457,234333"; 
+const CACHE_BUST = "v=3"; // Increment this to force a fresh fetch globally
 
 export interface TMDBItem {
   id: number;
@@ -39,7 +40,7 @@ export async function fetchTMDB(path: string, params: Record<string, string> = {
   const url = `${BASE_URL}?path=${proxyPath}`;
 
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } });
+    const res = await fetch(url, { next: { revalidate: 0 } }); // Disable cache for immediate cleanup
     if (!res.ok) {
       console.error(`Failed to fetch TMDB data: ${res.status} ${res.statusText}`);
       return null;
@@ -59,14 +60,17 @@ export function cleanData(items: TMDBItem[]): TMDBItem[] {
     "hentai", "ecchi", "erotica", "sexual content", "nudity", 
     "uncensored", "sexual", "sex", "adult animation", "porn",
     "harem", "bikini", "lingerie", "hot scenes", "romance sex",
-    "joshiochi", "sweet punishment", "overflow", "redo of healer"
+    "joshiochi", "sweet punishment", "overflow", "redo of healer",
+    "isekai meikyū", "harem in the labyrinth", "world's end harem"
   ];
 
   const ADULT_TITLES = [
     "overflow", "sweet punishment", "redo of healer", "yosuga no sora",
     "high school dxd", "shimoneta", "prison school", "joshiochi",
     "my wife is the student council president", "kiss x sis", 
-    "monster musume", "to love ru", "testament of sister new devil"
+    "monster musume", "to love ru", "testament of sister new devil",
+    "labyrinth of another world", "harem in the labyrinth",
+    "world's end harem", "valkyrie drive", "freezing", "seikon no qwaser"
   ];
 
   return items.filter(item => {
@@ -89,22 +93,22 @@ export function cleanData(items: TMDBItem[]): TMDBItem[] {
 }
 
 export async function getTrending() {
-  const data = await fetchTMDB(`trending/all/week?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`trending/all/week?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   return cleanData(data?.results || []);
 }
 
 export async function getPopularMovies() {
-  const data = await fetchTMDB(`movie/popular?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`movie/popular?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   return cleanData(data?.results || []);
 }
 
 export async function getTopRatedTVShows() {
-  const data = await fetchTMDB(`tv/top_rated?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`tv/top_rated?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   return cleanData(data?.results || []);
 }
 
 export async function getTrendingAnime() {
-  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   return cleanData(data?.results || []);
 }
 
@@ -112,45 +116,45 @@ export async function searchMulti(query: string, includeAdult: boolean = false) 
   // Always force safe search for global compliance
   const adultFlag = "false";
   const [page1, page2] = await Promise.all([
-    fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=1&include_adult=${adultFlag}`),
-    fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=2&include_adult=${adultFlag}`)
+    fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=1&include_adult=${adultFlag}&${CACHE_BUST}`),
+    fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=2&include_adult=${adultFlag}&${CACHE_BUST}`)
   ]);
   const combined = [...(page1?.results || []), ...(page2?.results || [])];
   return cleanData(combined);
 }
 
 export async function getMovieDetails(id: string) {
-  return await fetchTMDB(`movie/${id}`);
+  return await fetchTMDB(`movie/${id}?${CACHE_BUST}`);
 }
 
 export async function getTVDetails(id: string) {
-  return await fetchTMDB(`tv/${id}`);
+  return await fetchTMDB(`tv/${id}?${CACHE_BUST}`);
 }
 
 export async function getMovieRecommendations(id: string) {
-  const data = await fetchTMDB(`movie/${id}/recommendations?include_adult=false`);
+  const data = await fetchTMDB(`movie/${id}/recommendations?include_adult=false&${CACHE_BUST}`);
   return cleanData(data?.results || []);
 }
 
 export async function getTVRecommendations(id: string) {
-  const data = await fetchTMDB(`tv/${id}/recommendations?include_adult=false`);
+  const data = await fetchTMDB(`tv/${id}/recommendations?include_adult=false&${CACHE_BUST}`);
   return cleanData(data?.results || []);
 }
 
 export async function discoverMovies(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   if (data?.results) data.results = cleanData(data.results);
   return data;
 }
 
 export async function discoverTV(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   if (data?.results) data.results = cleanData(data.results);
   return data;
 }
 
 export async function discoverAnime(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}`);
+  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   if (data?.results) data.results = cleanData(data.results);
   return data;
 }

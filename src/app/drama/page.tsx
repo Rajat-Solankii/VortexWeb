@@ -2,25 +2,54 @@ import { getAllDramas } from "@/lib/tmdb";
 import MediaCard from "@/components/MediaCard";
 import Link from "next/link";
 
-export default async function DramaPage({ searchParams }: { searchParams: Promise<{ sort?: string, page?: string }> }) {
-  const { sort, page } = await searchParams;
+const LANGUAGES = [
+  { label: "All", value: "" },
+  { label: "Korean", value: "ko" },
+  { label: "Turkish", value: "tr" },
+  { label: "Chinese", value: "zh" },
+  { label: "Filipino", value: "tl" },
+];
+
+export default async function DramaPage({ searchParams }: { searchParams: Promise<{ sort?: string, page?: string, lang?: string }> }) {
+  const { sort, page, lang } = await searchParams;
   const sortBy = sort || "popularity.desc";
   const currentPage = parseInt(page || "1", 10);
+  const selectedLang = lang || "";
   
-  const data = await getAllDramas(sortBy, currentPage);
+  const data = await getAllDramas(sortBy, currentPage, selectedLang);
   const results = data?.results || [];
 
   return (
     <div className="w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-12">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 className="text-3xl font-bold text-white flex items-center space-x-3">
-            <span className="w-1.5 h-8 bg-vortex-purple rounded-full"></span>
-            <span>International Dramas</span>
-        </h1>
-        <div className="flex space-x-2 overflow-x-auto w-full md:w-auto pb-2 scrollbar-hide">
-           <Link href="/drama?sort=popularity.desc" className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${sortBy === 'popularity.desc' ? 'bg-vortex-purple text-white shadow-[0_0_15px_rgba(124,77,255,0.5)]' : 'bg-white/10 text-gray-300'}`}>Popular</Link>
-           <Link href="/drama?sort=vote_average.desc" className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${sortBy === 'vote_average.desc' ? 'bg-vortex-purple text-white shadow-[0_0_15px_rgba(124,77,255,0.5)]' : 'bg-white/10 text-gray-300'}`}>Top Rated</Link>
-           <Link href="/drama?sort=first_air_date.desc" className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${sortBy === 'first_air_date.desc' ? 'bg-vortex-purple text-white shadow-[0_0_15px_rgba(124,77,255,0.5)]' : 'bg-white/10 text-gray-300'}`}>Newest</Link>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-8">
+        <div>
+          <h1 className="text-4xl font-bold text-white flex items-center space-x-3 mb-2">
+              <span className="w-1.5 h-10 bg-vortex-purple rounded-full shadow-[0_0_15px_rgba(124,77,255,0.8)]"></span>
+              <span>Dramas</span>
+          </h1>
+          <p className="text-gray-400">Premium international drama series from across the globe.</p>
+        </div>
+        
+        <div className="flex flex-col gap-4 w-full md:w-auto">
+          {/* Language Selector */}
+          <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+            {LANGUAGES.map((l) => (
+              <Link
+                key={l.value}
+                href={`/drama?lang=${l.value}&sort=${sortBy}`}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all border ${selectedLang === l.value ? 'bg-white text-black border-white' : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10'}`}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Sort Selector */}
+          <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+             <Link href={`/drama?lang=${selectedLang}&sort=popularity.desc`} className={`px-4 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${sortBy === 'popularity.desc' ? 'text-vortex-purple bg-vortex-purple/10' : 'text-gray-500 hover:text-white'}`}>Most Popular</Link>
+             <Link href={`/drama?lang=${selectedLang}&sort=vote_average.desc`} className={`px-4 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${sortBy === 'vote_average.desc' ? 'text-vortex-purple bg-vortex-purple/10' : 'text-gray-500 hover:text-white'}`}>Top Rated</Link>
+             <Link href={`/drama?lang=${selectedLang}&sort=first_air_date.desc`} className={`px-4 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${sortBy === 'first_air_date.desc' ? 'text-vortex-purple bg-vortex-purple/10' : 'text-gray-500 hover:text-white'}`}>Recently Added</Link>
+          </div>
         </div>
       </div>
       
@@ -30,11 +59,17 @@ export default async function DramaPage({ searchParams }: { searchParams: Promis
         ))}
       </div>
       
+      {results.length === 0 && (
+        <div className="text-center py-20 text-gray-500">
+          No dramas found for this category.
+        </div>
+      )}
+
       <div className="flex justify-center mt-12 space-x-4">
          {currentPage > 1 && (
-             <Link href={`/drama?sort=${sortBy}&page=${currentPage - 1}`} className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">Previous</Link>
+             <Link href={`/drama?lang=${selectedLang}&sort=${sortBy}&page=${currentPage - 1}`} className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">Previous</Link>
          )}
-         <Link href={`/drama?sort=${sortBy}&page=${currentPage + 1}`} className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">Next Page</Link>
+         <Link href={`/drama?lang=${selectedLang}&sort=${sortBy}&page=${currentPage + 1}`} className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">Next Page</Link>
       </div>
     </div>
   );

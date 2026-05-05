@@ -53,11 +53,31 @@ export async function fetchTMDB(path: string, params: Record<string, string> = {
 // Utility to filter out junk results
 export function cleanData(items: TMDBItem[]): TMDBItem[] {
   if (!items) return [];
+
+  const ADULT_KEYWORDS = [
+    "hentai", "ecchi", "erotica", "sexual content", "nudity", 
+    "uncensored", "sexual", "sex", "adult animation", "porn"
+  ];
+
+  const ADULT_TITLES = [
+    "overflow", "sweet punishment", "redo of healer", "yosuga no sora",
+    "high school dxd", "shimoneta", "prison school"
+  ];
+
   return items.filter(item => {
-    // Filter out adult/nudity content explicitly
+    const title = (item.title || item.name || "").toLowerCase();
+    const overview = (item.overview || "").toLowerCase();
+
+    // 1. Filter out adult/nudity content explicitly
     if (item.adult === true) return false;
 
-    // Filter out missing posters, backdrops, or empty overviews to ensure a premium look
+    // 2. Filter out specific blacklisted titles (common adult anime)
+    if (ADULT_TITLES.some(t => title.includes(t))) return false;
+
+    // 3. Filter out adult keywords in overview or title
+    if (ADULT_KEYWORDS.some(k => overview.includes(k) || title.includes(k))) return false;
+
+    // 4. Quality Filter: missing posters, backdrops, or empty overviews
     if (!item.poster_path || !item.backdrop_path || !item.overview) return false;
     return true;
   });

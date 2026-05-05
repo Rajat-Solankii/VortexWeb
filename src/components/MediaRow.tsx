@@ -6,11 +6,13 @@ import { useRef, useState, useEffect } from "react";
 export default function MediaRow({ 
   title, 
   items, 
-  action 
+  action,
+  onRemove
 }: { 
   title: string; 
   items: TMDBItem[]; 
   action?: React.ReactNode;
+  onRemove?: (id: number) => void;
 }) {
   const rowRef = useRef<HTMLDivElement>(null);
   const [isMoved, setIsMoved] = useState(false);
@@ -62,7 +64,7 @@ export default function MediaRow({
         >
           {items.map((item) => (
             <div key={item.id} className="snap-start">
-               <MediaCard item={item} />
+               <MediaCard item={item} onRemove={onRemove} />
             </div>
           ))}
         </div>

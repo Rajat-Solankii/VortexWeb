@@ -25,6 +25,7 @@ export default function Footer() {
             <Link href="/anime" className="text-white/60 hover:text-white transition-colors">Anime</Link>
             <Link href="/genres" className="text-white/60 hover:text-white transition-colors">Genres</Link>
             <Link href="/drama" className="text-white/60 hover:text-white transition-colors">Drama</Link>
+            <Link href="/cartoons" className="text-white/60 hover:text-white transition-colors">Cartoons</Link>
           </div>
           
           <div className="flex flex-col gap-3">

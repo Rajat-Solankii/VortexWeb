@@ -268,6 +268,20 @@ export async function discoverDramas(sortBy: string = "popularity.desc", page: n
   return data;
 }
 
+export async function discoverCartoons(sortBy: string = "popularity.desc", page: number = 1, lang?: string) {
+  const languages = lang || "en|hi|ja"; // Default to common cartoon languages
+  // 16 = Animation, 10762 = Kids
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/tv?with_genres=16,10762&with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_genres=16,10762&with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_genres=16,10762&with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_genres=16,10762&with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, false, true) };
+}
+
 export async function getAllDramas(sortBy: string = "popularity.desc", page: number = 1, lang?: string, allowUnreleased: boolean = false) {
   const languages = lang || "ko|tr|zh|tl";
   

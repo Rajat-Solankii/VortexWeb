@@ -37,6 +37,7 @@ export default function Navbar() {
                 <Link href="/anime" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all hidden 2xl:block">Anime</Link>
                 <Link href="/genres" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Genres</Link>
                 <Link href="/drama" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Drama</Link>
+                <Link href="/cartoons" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all hidden xl:block">Cartoons</Link>
               </div>
             </div>
           </div>
@@ -104,7 +105,8 @@ export default function Navbar() {
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/tv" className="text-gray-300 hover:text-white font-medium p-3 bg-white/5 rounded-xl text-center border border-white/5">TV Shows</Link>
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/anime" className="text-gray-300 hover:text-white font-medium p-3 bg-white/5 rounded-xl text-center border border-white/5">Anime</Link>
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/genres" className="text-gray-300 hover:text-white font-medium p-3 bg-white/5 rounded-xl text-center border border-white/5">Genres</Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/drama" className="text-gray-300 hover:text-white font-medium p-3 bg-white/5 rounded-xl text-center border border-white/5 col-span-2">Drama</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/drama" className="text-gray-300 hover:text-white font-medium p-3 bg-white/5 rounded-xl text-center border border-white/5">Drama</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/cartoons" className="text-gray-300 hover:text-white font-medium p-3 bg-white/5 rounded-xl text-center border border-white/5">Cartoons</Link>
             </div>
         </div>
       )}

@@ -12,10 +12,21 @@ export default function AdBlockWall() {
       // 1. Element-based check (Bait div)
       const bait = document.createElement("div");
       bait.innerHTML = "&nbsp;";
-      bait.className = "pub_300x250 pub_728x90 text-ad textAd adsbox ad-unit ad-layer ads-container banner-ad";
+      bait.className = "adsbox ad-unit ad-layer ads-container banner-ad pub_300x250 pub_728x90 text-ad textAd";
       bait.setAttribute("style", "width: 1px; height: 1px; position: absolute; left: -10000px; top: -1000px;");
       document.body.appendChild(bait);
       
+      // Use MutationObserver to see if uBlock removes it instantly
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (Array.from(mutation.removedNodes).includes(bait)) {
+             setIsAdBlockActive(true);
+          }
+        });
+      });
+      observer.observe(document.body, { childList: true });
+
+      // Check if already hidden by CSS
       const isElementBlocked = window.getComputedStyle(bait).getPropertyValue("display") === "none" || 
                                bait.offsetHeight === 0;
 
@@ -23,13 +34,18 @@ export default function AdBlockWall() {
       let isFetchBlocked = false;
       try {
         const baitUrl = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
-        await fetch(new Request(baitUrl), { method: "HEAD", mode: "no-cors" });
+        await fetch(new Request(baitUrl), { method: "HEAD", mode: "no-cors", cache: "no-store" });
       } catch (error) {
         isFetchBlocked = true;
       }
 
       setIsAdBlockActive(isElementBlocked || isFetchBlocked);
-      document.body.removeChild(bait);
+      
+      // Cleanup after a delay
+      setTimeout(() => {
+        if (document.body.contains(bait)) document.body.removeChild(bait);
+        observer.disconnect();
+      }, 5000);
     };
 
     // Run check after a short delay to let blockers initialize

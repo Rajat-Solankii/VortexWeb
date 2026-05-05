@@ -28,11 +28,10 @@ export default function AdsterraBanner300() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center gap-2 my-8">
-      <span className="text-[10px] uppercase tracking-widest text-white/20 font-medium">Sponsored</span>
-      <div
-        ref={bannerRef}
-        className="min-h-[250px] min-w-[300px] bg-white/5 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden"
+    <div className="flex justify-center my-8">
+      <div 
+        ref={bannerRef} 
+        className="min-h-[250px] min-w-[300px]"
       />
     </div>
   );

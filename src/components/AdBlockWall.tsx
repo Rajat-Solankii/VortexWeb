@@ -9,43 +9,42 @@ export default function AdBlockWall() {
     setIsClient(true);
     
     const checkAdBlock = async () => {
-      // 1. Element-based check (Bait div)
+      // 1. Create a "Super Bait" element
       const bait = document.createElement("div");
-      bait.innerHTML = "&nbsp;";
-      bait.className = "adsbox ad-unit ad-layer ads-container banner-ad pub_300x250 pub_728x90 text-ad textAd";
-      bait.setAttribute("style", "width: 1px; height: 1px; position: absolute; left: -10000px; top: -1000px;");
+      bait.setAttribute("id", "ad_unit_trap");
+      bait.className = "pub_300x250 pub_728x90 text-ad textAd adsbox ad-unit ad-layer ads-container banner-ad google-ad";
+      bait.setAttribute("style", "width: 1px !important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px !important; display: block !important; visibility: visible !important;");
       document.body.appendChild(bait);
       
-      // Use MutationObserver to see if uBlock removes it instantly
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (Array.from(mutation.removedNodes).includes(bait)) {
-             setIsAdBlockActive(true);
+      // Wait for a moment for blockers to react
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const isHidden = window.getComputedStyle(bait).getPropertyValue("display") === "none" || 
+                       window.getComputedStyle(bait).getPropertyValue("visibility") === "hidden" ||
+                       bait.offsetParent === null ||
+                       bait.offsetHeight === 0;
+
+      // 2. Fetch multiple known ad scripts
+      const scripts = [
+        "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
+        "https://pl29341352.profitablecpmratenetwork.com/78/bc/89/78bc896d2b5f195d7bb698d8e24e8c18.js"
+      ];
+
+      let isScriptBlocked = false;
+      for (const url of scripts) {
+        try {
+          const res = await fetch(new Request(url), { method: "HEAD", mode: "no-cors", cache: "no-store" });
+          if (res.status === 0) { // status 0 usually means a network block in some browsers
+             // but no-cors makes this unreliable, so we rely on the catch block
           }
-        });
-      });
-      observer.observe(document.body, { childList: true });
-
-      // Check if already hidden by CSS
-      const isElementBlocked = window.getComputedStyle(bait).getPropertyValue("display") === "none" || 
-                               bait.offsetHeight === 0;
-
-      // 2. Fetch-based check (Bait URL)
-      let isFetchBlocked = false;
-      try {
-        const baitUrl = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
-        await fetch(new Request(baitUrl), { method: "HEAD", mode: "no-cors", cache: "no-store" });
-      } catch (error) {
-        isFetchBlocked = true;
+        } catch (e) {
+          isScriptBlocked = true;
+          break;
+        }
       }
 
-      setIsAdBlockActive(isElementBlocked || isFetchBlocked);
-      
-      // Cleanup after a delay
-      setTimeout(() => {
-        if (document.body.contains(bait)) document.body.removeChild(bait);
-        observer.disconnect();
-      }, 5000);
+      setIsAdBlockActive(isHidden || isScriptBlocked);
+      if (document.body.contains(bait)) document.body.removeChild(bait);
     };
 
     // Run check after a short delay to let blockers initialize

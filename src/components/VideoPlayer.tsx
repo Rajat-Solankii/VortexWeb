@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-export default function VideoPlayer({ type, id, season, episode }: { type: "movie" | "tv", id: string, season?: number, episode?: number }) {
+export default function VideoPlayer({ type, id, season, episode, title }: { type: "movie" | "tv", id: string, season?: number, episode?: number, title?: string }) {
   const [server, setServer] = useState(1);
 
   let url = "";
@@ -12,21 +12,23 @@ export default function VideoPlayer({ type, id, season, episode }: { type: "movi
     switch(server) {
       case 1: url = `https://player.videasy.net/movie/${id}`; break;
       case 2: url = `https://vidsrc.me/embed/movie?tmdb=${id}`; break;
-      case 3: url = `https://embed.su/embed/movie/${id}`; break;
-      case 4: url = `https://vidsrc.xyz/embed/movie?tmdb=${id}`; break;
-      case 5: url = `https://player.smashy.stream/movie/${id}`; break;
+      case 3: url = `https://vidsrc.xyz/embed/movie?tmdb=${id}`; break;
+      case 4: url = `https://vidsrc.cc/v2/embed/movie/${id}`; break;
+      case 5: url = `https://www.superembed.cc/embed/movie/${id}`; break;
       default: url = `https://player.videasy.net/movie/${id}`;
     }
   } else {
     switch(server) {
       case 1: url = `https://player.videasy.net/tv/${id}/${s}/${e}`; break;
       case 2: url = `https://vidsrc.me/embed/tv?tmdb=${id}&sea=${s}&epi=${e}`; break;
-      case 3: url = `https://embed.su/embed/tv/${id}/${s}/${e}`; break;
-      case 4: url = `https://vidsrc.xyz/embed/tv?tmdb=${id}&sea=${s}&epi=${e}`; break;
-      case 5: url = `https://player.smashy.stream/tv/${id}?s=${s}&e=${e}`; break;
+      case 3: url = `https://vidsrc.xyz/embed/tv?tmdb=${id}&sea=${s}&epi=${e}`; break;
+      case 4: url = `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`; break;
+      case 5: url = `https://www.superembed.cc/embed/tv/${id}/${s}/${e}`; break;
       default: url = `https://player.videasy.net/tv/${id}/${s}/${e}`;
     }
   }
+
+  const youtubeQuery = encodeURIComponent(`${title || ""} full episode ${type === 'tv' ? `season ${s} episode ${e}` : ''}`);
 
   return (
     <div className="space-y-4">
@@ -45,7 +47,7 @@ export default function VideoPlayer({ type, id, season, episode }: { type: "movi
          <div className="flex flex-col">
             <div className="flex items-center justify-between mb-3">
                 <span className="text-[10px] font-black text-vortex-purple uppercase tracking-[0.2em]">Playback Servers</span>
-                <span className="text-[9px] text-gray-500 uppercase">Try different servers if data is missing</span>
+                <span className="text-[9px] text-gray-500 uppercase">Server 2 & 4 are best for Cartoons</span>
             </div>
             
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -62,9 +64,25 @@ export default function VideoPlayer({ type, id, season, episode }: { type: "movi
          </div>
       </div>
       
-      <div className="flex items-center space-x-2 text-[10px] text-gray-500 p-3 bg-white/5 rounded-xl border border-white/5">
-        <span className="w-1.5 h-1.5 rounded-full bg-vortex-purple animate-pulse"></span>
-        <p>Pro Tip: <span className="text-white">Server 2</span> and <span className="text-white">Server 4</span> have the best libraries for cartoons and TV shows.</p>
+      {/* Dynamic Fallback for Cartoons/Missing Content */}
+      <div className="p-4 bg-gradient-to-r from-vortex-purple/10 to-vortex-blue/10 rounded-2xl border border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 animate-pulse">
+                <span className="text-xl">!</span>
+            </div>
+            <div>
+                <p className="text-sm font-bold text-white">Still not working?</p>
+                <p className="text-[10px] text-gray-400">Some Indian cartoons like Motu Patlu have restricted data.</p>
+            </div>
+        </div>
+        <a 
+          href={`https://www.youtube.com/results?search_query=${youtubeQuery}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black rounded-xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] uppercase tracking-wider"
+        >
+          Watch on YouTube
+        </a>
       </div>
     </div>
   );

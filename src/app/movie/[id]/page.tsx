@@ -63,7 +63,7 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
                       </div>
                     </div>
                   ) : (
-                    <VideoPlayer type="movie" id={id} />
+                    <VideoPlayer type="movie" id={id} title={movie.title} />
                   )}
                  <TrailerPlayer trailers={trailers} />
                  <CastSection cast={cast} />

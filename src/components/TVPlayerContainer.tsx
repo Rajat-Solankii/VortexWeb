@@ -21,7 +21,7 @@ export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
         </h2>
         <DownloadMediaButton type="tv" id={id} season={season} episode={episode} title={tv.name} />
       </div>
-      <VideoPlayer type="tv" id={id} season={season} episode={episode} />
+      <VideoPlayer type="tv" id={id} season={season} episode={episode} title={tv.name} />
       
 
 

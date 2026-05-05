@@ -16,7 +16,9 @@ export default async function DramaPage({ searchParams }: { searchParams: Promis
   const currentPage = parseInt(page || "1", 10);
   const selectedLang = lang || "";
   
-  const data = await getAllDramas(sortBy, currentPage, selectedLang);
+  // If sorting by newest, we should allow unreleased content to fill the grid
+  const allowUnreleased = sortBy === "first_air_date.desc";
+  const data = await getAllDramas(sortBy, currentPage, selectedLang, allowUnreleased);
   const results = data?.results || [];
 
   return (

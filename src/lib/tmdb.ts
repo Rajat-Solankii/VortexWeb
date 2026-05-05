@@ -268,7 +268,7 @@ export async function discoverDramas(sortBy: string = "popularity.desc", page: n
   return data;
 }
 
-export async function getAllDramas(sortBy: string = "popularity.desc", page: number = 1, lang?: string) {
+export async function getAllDramas(sortBy: string = "popularity.desc", page: number = 1, lang?: string, allowUnreleased: boolean = false) {
   const languages = lang || "ko|tr|zh|tl";
   
   const [p1, p2, p3, p4] = await Promise.all([
@@ -279,5 +279,5 @@ export async function getAllDramas(sortBy: string = "popularity.desc", page: num
   ]);
   
   const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
-  return { results: cleanData(results, true, false, true) };
+  return { results: cleanData(results, true, allowUnreleased, true) };
 }

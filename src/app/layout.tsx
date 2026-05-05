@@ -33,12 +33,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        {/* Google AdSense Global Script - plain tag for crawler visibility */}
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2781750854299489"
-          crossOrigin="anonymous"
-        />
         {/* Adsterra Social Bar */}
         <script 
           type='text/javascript' 

@@ -2,7 +2,6 @@
 import { useState } from "react";
 import VideoPlayer from "./VideoPlayer";
 import EpisodeSelector from "./EpisodeSelector";
-import AdBanner from "./AdBanner";
 import HistoryTracker from "./HistoryTracker";
 
 export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
@@ -20,10 +19,7 @@ export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
       </h2>
       <VideoPlayer type="tv" id={id} season={season} episode={episode} />
       
-      {/* Adaptive Horizontal Ad */}
-      <div className="w-full mt-6 mb-2">
-         <AdBanner className="h-auto min-h-[100px] aspect-[6/1] sm:aspect-[8/1]" dataAdSlot="7705358528" />
-      </div>
+
 
       <EpisodeSelector 
          seasons={seasons} 

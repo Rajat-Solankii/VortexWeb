@@ -15,6 +15,7 @@ export interface TMDBItem {
   first_air_date?: string;
   adult?: boolean;
   genre_ids?: number[];
+  vote_count?: number;
 }
 
 export interface TMDBResponse {
@@ -69,9 +70,24 @@ export function cleanData(items: TMDBItem[], strict: boolean = true): TMDBItem[]
     "world's end harem", "valkyrie drive", "freezing", "seikon no qwaser"
   ];
 
+  const now = new Date().toISOString().split('T')[0];
+
   return items.filter(item => {
-    // Basic Quality Filter: missing posters/backdrops
+    // Basic Quality Filter: missing posters/backdrops/overview
     if (!item.poster_path || !item.backdrop_path || !item.overview) return false;
+
+    // Playability check: Ensure it has been released and has some ratings (indicator of being a real distributed title)
+    const releaseDate = item.release_date || item.first_air_date;
+    if (!releaseDate || releaseDate > now) return false;
+    
+    // Items with very few votes are often unplayable or placeholders in databases
+    if (item.vote_count !== undefined && item.vote_count < 10) return false;
+
+    // Filter out genres that are usually not available on movie streaming sources
+    // 10763 = News, 10767 = Talk, 10764 = Reality
+    const genreIds = item.genre_ids || [];
+    const unplayableGenres = [10763, 10767];
+    if (genreIds.some((id: number) => unplayableGenres.includes(id))) return false;
 
     // Strict Filtering (For Homepage / Trending / Discover)
     if (strict) {
@@ -162,19 +178,61 @@ export async function getTVRecommendations(id: string) {
 }
 
 export async function discoverMovies(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  if (data?.results) data.results = cleanData(data.results, true);
-  return data;
+  // Fetch 2 pages to ensure the grid is full
+  const [p1, p2] = await Promise.all([
+    fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || [])];
+  return { results: cleanData(results, true) };
 }
 
 export async function discoverTV(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  if (data?.results) data.results = cleanData(data.results, true);
-  return data;
+  // Fetch 2 pages to ensure the grid is full
+  const [p1, p2] = await Promise.all([
+    fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || [])];
+  return { results: cleanData(results, true) };
 }
 
 export async function discoverAnime(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  // Fetch 2 pages to ensure the grid is full
+  const [p1, p2] = await Promise.all([
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || [])];
+  return { results: cleanData(results, true) };
+}
+
+export async function getBollywoodMovies() {
+  const data = await fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  return cleanData(data?.results || [], true);
+}
+
+export async function getUpcomingMovies() {
+  const data = await fetchTMDB(`movie/upcoming?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
+  return cleanData(data?.results || [], true);
+}
+
+export async function getVideos(type: "movie" | "tv", id: string) {
+  const data = await fetchTMDB(`${type}/${id}/videos`);
+  return data?.results?.filter((v: any) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser")) || [];
+}
+
+export async function getGenres(type: "movie" | "tv") {
+  const data = await fetchTMDB(`genre/${type}/list`);
+  return data?.genres || [];
+}
+
+export async function getTVSeason(id: string, season: number) {
+  return await fetchTMDB(`tv/${id}/season/${season}`);
+}
+
+export async function discoverByGenre(type: "movie" | "tv", genreId: string, sortBy: string = "popularity.desc", page: number = 1) {
+  const data = await fetchTMDB(`discover/${type}?with_genres=${genreId}&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
   if (data?.results) data.results = cleanData(data.results, true);
   return data;
 }

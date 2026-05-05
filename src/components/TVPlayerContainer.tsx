@@ -26,6 +26,7 @@ export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
 
 
       <EpisodeSelector 
+         tvId={id}
          seasons={seasons} 
          onSelect={(s, e) => {
             setSeason(s);

@@ -3,15 +3,17 @@ import HistoryTracker from "@/components/HistoryTracker";
 import DownloadMediaButton from "@/components/DownloadMediaButton";
 import CastSection from "@/components/CastSection";
 import VideoPlayer from "@/components/VideoPlayer";
+import TrailerPlayer from "@/components/TrailerPlayer";
 import MediaRow from "@/components/MediaRow";
-import { getMovieDetails, getMovieRecommendations, getCredits } from "@/lib/tmdb";
+import { getMovieDetails, getMovieRecommendations, getCredits, getVideos } from "@/lib/tmdb";
 
 export default async function MovieDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-   const [movie, recommendations, cast] = await Promise.all([
+   const [movie, recommendations, cast, trailers] = await Promise.all([
      getMovieDetails(id),
      getMovieRecommendations(id),
-     getCredits("movie", id)
+     getCredits("movie", id),
+     getVideos("movie", id)
    ]);
 
   if (!movie) return <div className="text-white text-center py-20">Movie not found.</div>;
@@ -48,6 +50,7 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
                    <DownloadMediaButton type="movie" id={id} title={movie.title} />
                 </div>
                  <VideoPlayer type="movie" id={id} />
+                 <TrailerPlayer trailers={trailers} />
                  <CastSection cast={cast} />
               </div>
 

@@ -32,35 +32,35 @@ export default function HomeClientView({
   const [mode, setMode] = useState<Mode>("all");
 
   return (
-    <div className="-mt-16 md:mt-[-80px] relative z-10">
+    <div className="relative z-10">
       
-      {/* Category Toggles */}
-      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 px-4 sm:px-6 lg:px-10 xl:px-16 mb-8 mt-16 md:mt-0 relative z-30">
+      {/* Category Toggles - High priority z-index to prevent hero overlap */}
+      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 px-4 sm:px-6 lg:px-10 xl:px-16 mb-10 -mt-8 md:mt-0 relative z-40 pointer-events-auto">
         <button 
           type="button"
           onClick={() => setMode("all")}
-          className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${mode === "all" ? "bg-white text-black scale-105" : "bg-white/10 text-white hover:bg-white/20"}`}
+          className={`px-6 py-2 rounded-full text-sm font-bold transition-all shadow-xl border ${mode === "all" ? "bg-white text-black border-white scale-105" : "bg-white/5 text-white border-white/10 hover:bg-white/20"}`}
         >
           All
         </button>
         <button 
           type="button"
           onClick={() => setMode("movies")}
-          className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${mode === "movies" ? "bg-white text-black scale-105" : "bg-white/10 text-white hover:bg-white/20"}`}
+          className={`px-6 py-2 rounded-full text-sm font-bold transition-all shadow-xl border ${mode === "movies" ? "bg-white text-black border-white scale-105" : "bg-white/5 text-white border-white/10 hover:bg-white/20"}`}
         >
           Movies
         </button>
         <button 
           type="button"
           onClick={() => setMode("tv")}
-          className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${mode === "tv" ? "bg-white text-black scale-105" : "bg-white/10 text-white hover:bg-white/20"}`}
+          className={`px-6 py-2 rounded-full text-sm font-bold transition-all shadow-xl border ${mode === "tv" ? "bg-white text-black border-white scale-105" : "bg-white/5 text-white border-white/10 hover:bg-white/20"}`}
         >
           TV Shows
         </button>
         <button 
           type="button"
           onClick={() => setMode("anime")}
-          className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${mode === "anime" ? "bg-white text-black scale-105" : "bg-white/10 text-white hover:bg-white/20"}`}
+          className={`px-6 py-2 rounded-full text-sm font-bold transition-all shadow-xl border ${mode === "anime" ? "bg-white text-black border-white scale-105" : "bg-white/5 text-white border-white/10 hover:bg-white/20"}`}
         >
           Anime
         </button>

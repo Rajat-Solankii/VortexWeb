@@ -51,8 +51,10 @@ export async function fetchTMDB(path: string, params: Record<string, string> = {
 }
 
 // Utility to filter out junk results
-export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnreleased: boolean = false): TMDBItem[] {
+export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnreleased: boolean = false, lenient: boolean = false): TMDBItem[] {
   if (!items) return [];
+
+  const now = new Date().toISOString().split('T')[0];
 
   const ADULT_KEYWORDS = [
     "hentai", "ecchi", "erotica", "sexual content", "nudity", 
@@ -70,31 +72,34 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
     "world's end harem", "valkyrie drive", "freezing", "seikon no qwaser"
   ];
 
-  const now = new Date().toISOString().split('T')[0];
-
   return items.filter(item => {
-    // Basic Quality Filter: missing posters/backdrops/overview
-    if (!item.poster_path || !item.backdrop_path || !item.overview) return false;
+    // Basic Quality Filter: missing posters/backdrops
+    if (!item.poster_path || !item.backdrop_path) return false;
+
+    // Adult content check
+    if (item.adult === true) return false;
 
     // Playability check: Ensure it has been released (unless we allow unreleased)
     const releaseDate = item.release_date || item.first_air_date;
-    if (!allowUnreleased && (!releaseDate || releaseDate > now)) return false;
+    if (!allowUnreleased && releaseDate && releaseDate > now) return false;
     
-    // Items with very few votes are often unplayable or placeholders (unless it's upcoming)
-    if (!allowUnreleased && item.vote_count !== undefined && item.vote_count < 10) return false;
+    // Vote Count Check: 
+    // Strict mode (Homepage) requires 10+ votes.
+    // Lenient mode (Discovery pages) requires at least 1 vote.
+    const voteCount = item.vote_count || 0;
+    if (strict && !lenient && voteCount < 10) return false;
+    if (lenient && voteCount < 1) return false;
 
-    // Filter out genres that are usually not available on movie streaming sources
-    // 10763 = News, 10767 = Talk, 10764 = Reality
+    // Filter out unplayable genres (News, Talk)
     const genreIds = item.genre_ids || [];
     const unplayableGenres = [10763, 10767];
     if (genreIds.some((id: number) => unplayableGenres.includes(id))) return false;
 
-    // Strict Filtering (For Homepage / Trending / Discover)
+    // Strict Text Filtering (For Titles and Overviews)
     if (strict) {
       const title = (item.title || item.name || "").toLowerCase();
       const overview = (item.overview || "").toLowerCase();
 
-      if (item.adult === true) return false;
       if (ADULT_TITLES.some(t => title.includes(t))) return false;
       if (ADULT_KEYWORDS.some(k => overview.includes(k) || title.includes(k))) return false;
     }
@@ -124,14 +129,13 @@ export async function getTrendingAnime() {
 }
 
 export async function searchMulti(query: string, includeAdult: boolean = true) {
-  // Search is unrestricted as per user request
   const adultFlag = "true"; 
   const [page1, page2] = await Promise.all([
     fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=1&include_adult=${adultFlag}`),
     fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=2&include_adult=${adultFlag}`)
   ]);
   const combined = [...(page1?.results || []), ...(page2?.results || [])];
-  return cleanData(combined, false); // strict = false for search
+  return cleanData(combined, false); 
 }
 
 export async function getKDramas() {
@@ -156,7 +160,7 @@ export async function getPhilippineDramas() {
 
 export async function getCredits(type: "movie" | "tv", id: string) {
   const data = await fetchTMDB(`${type}/${id}/credits`);
-  return data?.cast?.slice(0, 12) || []; // Top 12 cast members
+  return data?.cast?.slice(0, 12) || []; 
 }
 
 export async function getMovieDetails(id: string) {
@@ -178,33 +182,30 @@ export async function getTVRecommendations(id: string) {
 }
 
 export async function discoverMovies(sortBy: string = "popularity.desc", page: number = 1) {
-  // Fetch 2 pages to ensure the grid is full
   const [p1, p2] = await Promise.all([
     fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
     fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
   const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true) };
+  return { results: cleanData(results, true, false, true) };
 }
 
 export async function discoverTV(sortBy: string = "popularity.desc", page: number = 1) {
-  // Fetch 2 pages to ensure the grid is full
   const [p1, p2] = await Promise.all([
     fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
     fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
   const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true) };
+  return { results: cleanData(results, true, false, true) };
 }
 
 export async function discoverAnime(sortBy: string = "popularity.desc", page: number = 1) {
-  // Fetch 2 pages to ensure the grid is full
   const [p1, p2] = await Promise.all([
     fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
     fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
   const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true) };
+  return { results: cleanData(results, true, false, true) };
 }
 
 export async function discoverBollywood(sortBy: string = "popularity.desc", page: number = 1) {
@@ -213,7 +214,7 @@ export async function discoverBollywood(sortBy: string = "popularity.desc", page
     fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
   const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true) };
+  return { results: cleanData(results, true, false, true) };
 }
 
 export async function discoverHollywood(sortBy: string = "popularity.desc", page: number = 1) {
@@ -222,7 +223,7 @@ export async function discoverHollywood(sortBy: string = "popularity.desc", page
     fetchTMDB(`discover/movie?with_original_language=en&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
   const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true) };
+  return { results: cleanData(results, true, false, true) };
 }
 
 export async function getBollywoodMovies() {
@@ -251,26 +252,25 @@ export async function getTVSeason(id: string, season: number) {
 
 export async function discoverByGenre(type: "movie" | "tv", genreId: string, sortBy: string = "popularity.desc", page: number = 1) {
   const data = await fetchTMDB(`discover/${type}?with_genres=${genreId}&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  if (data?.results) data.results = cleanData(data.results, true);
+  if (data?.results) data.results = cleanData(data.results, true, false, true);
   return data;
 }
 
 export async function discoverKDramas(sortBy: string = "popularity.desc", page: number = 1) {
   const data = await fetchTMDB(`discover/tv?with_original_language=ko&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  if (data?.results) data.results = cleanData(data.results, true);
+  if (data?.results) data.results = cleanData(data.results, true, false, true);
   return data;
 }
 
 export async function discoverDramas(sortBy: string = "popularity.desc", page: number = 1) {
   const data = await fetchTMDB(`discover/tv?with_original_language=ko|tr|zh|tl&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  if (data?.results) data.results = cleanData(data.results, true);
+  if (data?.results) data.results = cleanData(data.results, true, false, true);
   return data;
 }
 
 export async function getAllDramas(sortBy: string = "popularity.desc", page: number = 1, lang?: string) {
   const languages = lang || "ko|tr|zh|tl";
   
-  // Fetch 4 pages at once to ensure density even after filtering
   const [p1, p2, p3, p4] = await Promise.all([
     fetchTMDB(`discover/tv?with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
     fetchTMDB(`discover/tv?with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
@@ -279,5 +279,5 @@ export async function getAllDramas(sortBy: string = "popularity.desc", page: num
   ]);
   
   const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
-  return { results: cleanData(results, true) };
+  return { results: cleanData(results, true, false, true) };
 }

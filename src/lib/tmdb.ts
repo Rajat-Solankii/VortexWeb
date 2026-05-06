@@ -72,9 +72,25 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
     "world's end harem", "valkyrie drive", "freezing", "seikon no qwaser"
   ];
 
+  const FORBIDDEN_KEYWORDS = [
+    "video game", "music video", "behind the scenes", "making of", "soundtrack",
+    "roblox", "fan made", "fanmade", "fan-made", "tribute", "edit", "whatsapp status",
+    "concept trailer", "unauthorized", "full movie in"
+  ];
+
   return items.filter(item => {
-    // Basic Quality Filter: missing posters/backdrops
+    // Media Type Filter: Only allow movies and tv shows
+    if (item.media_type && !["movie", "tv"].includes(item.media_type)) return false;
+    
+    // Quality Filter: Must have title/name and poster/backdrop
+    if (!(item.title || item.name)) return false;
     if (!item.poster_path || !item.backdrop_path) return false;
+
+    const title = (item.title || item.name || "").toLowerCase();
+    const overview = (item.overview || "").toLowerCase();
+
+    // Filter out games and irrelevant non-movie content
+    if (FORBIDDEN_KEYWORDS.some(k => title.includes(k) || overview.includes(k))) return false;
 
     // Adult content check
     if (item.adult === true) return false;
@@ -83,12 +99,9 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
     const releaseDate = item.release_date || item.first_air_date;
     if (!allowUnreleased && releaseDate && releaseDate > now) return false;
     
-    // Vote Count Check: 
-    // Strict mode (Homepage) requires 10+ votes.
-    // Lenient mode (Discovery pages) requires at least 1 vote.
     const voteCount = item.vote_count || 0;
     if (strict && !lenient && voteCount < 10) return false;
-    if (lenient && voteCount < 1) return false;
+    if (lenient && voteCount < 0) return false; 
 
     // Filter out unplayable genres (News, Talk)
     const genreIds = item.genre_ids || [];
@@ -97,9 +110,6 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
 
     // Strict Text Filtering (For Titles and Overviews)
     if (strict) {
-      const title = (item.title || item.name || "").toLowerCase();
-      const overview = (item.overview || "").toLowerCase();
-
       if (ADULT_TITLES.some(t => title.includes(t))) return false;
       if (ADULT_KEYWORDS.some(k => overview.includes(k) || title.includes(k))) return false;
     }
@@ -128,14 +138,121 @@ export async function getTrendingAnime() {
   return cleanData(data?.results || [], true);
 }
 
-export async function searchMulti(query: string, includeAdult: boolean = true) {
+// Levenshtein distance for typo tolerance
+function getLevenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+async function getGoogleCorrection(query: string): Promise<string | null> {
+  try {
+    const isBrowser = typeof window !== "undefined";
+    const url = isBrowser 
+      ? `/api/suggestions?q=${encodeURIComponent(query)}`
+      : `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}`;
+    
+    const res = await fetch(url);
+    const data = await res.json();
+    // Google returns [query, [suggestions]]
+    if (data && data[1] && data[1].length > 0) {
+      const bestMatch = data[1][0];
+      if (bestMatch.toLowerCase() !== query.toLowerCase()) {
+        return bestMatch;
+      }
+    }
+  } catch (e) {
+    console.error("Correction error:", e);
+  }
+  return null;
+}
+
+export async function searchMulti(query: string, includeAdult: boolean = true, isForced: boolean = false) {
   const adultFlag = "true"; 
-  const [page1, page2] = await Promise.all([
+  const cleanQuery = query.toLowerCase().trim();
+  const words = cleanQuery.split(/\s+/);
+  let correctedQuery: string | undefined;
+  
+  // 1. Initial search
+  let [page1, page2] = await Promise.all([
     fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=1&include_adult=${adultFlag}`),
     fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=2&include_adult=${adultFlag}`)
   ]);
-  const combined = [...(page1?.results || []), ...(page2?.results || [])];
-  return cleanData(combined, false); 
+  
+  let combined = [...(page1?.results || []), ...(page2?.results || [])];
+  
+  // 2. Fallback for typos (Google-like correction)
+  if (combined.length === 0 && !isForced) {
+    const correction = await getGoogleCorrection(query);
+    if (correction) {
+      correctedQuery = correction;
+      const [corrPage1, corrPage2] = await Promise.all([
+        fetchTMDB(`search/multi?query=${encodeURIComponent(correction)}&page=1&include_adult=${adultFlag}`),
+        fetchTMDB(`search/multi?query=${encodeURIComponent(correction)}&page=2&include_adult=${adultFlag}`)
+      ]);
+      combined = [...(corrPage1?.results || []), ...(corrPage2?.results || [])];
+    }
+  }
+
+  // 3. Fallback for multi-word queries that return nothing
+  if (combined.length === 0 && words.length > 1) {
+    const fallback2Word = words.slice(0, 2).join(" ");
+    const fallback1Word = words[0];
+    
+    const [data2, data1] = await Promise.all([
+      fetchTMDB(`search/multi?query=${encodeURIComponent(fallback2Word)}&page=1&include_adult=${adultFlag}`),
+      fetchTMDB(`search/multi?query=${encodeURIComponent(fallback1Word)}&page=1&include_adult=${adultFlag}`)
+    ]);
+    
+    combined = [...(data2?.results || []), ...(data1?.results || [])];
+  }
+  
+  // Deduplicate results
+  const seenIds = new Set();
+  const uniqueCombined = combined.filter(item => {
+    if (seenIds.has(item.id)) return false;
+    seenIds.add(item.id);
+    return true;
+  });
+
+  // Clean and filter
+  let cleaned = cleanData(uniqueCombined, false, true, true); 
+
+  // Re-rank based on relevance (levenshtein) and popularity
+  const ranked = cleaned.map(item => {
+    const title = (item.title || item.name || "").toLowerCase();
+    const distance = getLevenshteinDistance(cleanQuery, title);
+    
+    // Exact matches get a huge boost
+    const isExact = title.includes(cleanQuery);
+    // Partial word matches
+    const containsAnyWord = words.some(w => w.length > 2 && title.includes(w));
+    
+    const score = (isExact ? 1000 : 0) + 
+                  (containsAnyWord ? 200 : 0) + 
+                  (item.popularity || 0) / 10 - 
+                  distance * 5;
+    
+    return { ...item, _score: score };
+  });
+
+  const finalResults = ranked.sort((a: any, b: any) => b._score - a._score);
+  return { results: finalResults, correctedQuery };
 }
 
 export async function getKDramas() {

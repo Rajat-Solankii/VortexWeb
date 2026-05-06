@@ -1,22 +1,92 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, Menu, X, LayoutGrid } from "lucide-react";
 import { useRouter } from "next/navigation";
 import DownloadAppButton from "./DownloadAppButton";
+import SearchSuggestions from "./SearchSuggestions";
+import { searchMulti, TMDBItem } from "@/lib/tmdb";
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<TMDBItem[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const router = useRouter();
+  const searchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (query.trim().length >= 2) {
+        setIsLoading(true);
+        setShowSuggestions(true);
+        try {
+          const { results } = await searchMulti(query);
+          setSuggestions(results || []);
+        } catch (error) {
+          console.error("Search error:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  // Handle click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current && !searchRef.current.contains(event.target as Node) &&
+        mobileSearchRef.current && !mobileSearchRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (activeIndex >= 0 && suggestions[activeIndex]) {
+      handleSelectSuggestion(suggestions[activeIndex]);
+      return;
+    }
     if (query.trim()) {
       router.push(`/search?q=${encodeURIComponent(query)}`);
+      setQuery("");
       setIsMobileMenuOpen(false);
       setIsSearchOpen(false);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSelectSuggestion = (item: TMDBItem) => {
+    const type = item.media_type || (item.title ? "movie" : "tv");
+    router.push(`/${type}/${item.id}`);
+    setQuery("");
+    setShowSuggestions(false);
+    setIsSearchOpen(false);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      setActiveIndex(prev => Math.min(prev + 1, suggestions.length - 1));
+    } else if (e.key === "ArrowUp") {
+      setActiveIndex(prev => Math.max(prev - 1, -1));
+    } else if (e.key === "Escape") {
+      setShowSuggestions(false);
     }
   };
 
@@ -30,36 +100,51 @@ export default function Navbar() {
             </Link>
             {/* Alphabetical Links */}
             <div className="hidden lg:block">
-              <div className="flex items-baseline space-x-4 xl:space-x-6">
-                <Link href="/anime" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Anime</Link>
-                <Link href="/bollywood" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all hidden xl:block">Bollywood</Link>
-                <Link href="/cartoons" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all hidden xl:block">Cartoons</Link>
-                <Link href="/drama" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Drama</Link>
-                <Link href="/hollywood" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all hidden xl:block">Hollywood</Link>
-                <Link href="/movies" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">Movies</Link>
-                <Link href="/tv" className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(0,176,255,0.8)] text-sm font-medium transition-all">TV Shows</Link>
+              <div className="flex items-center space-x-1 xl:space-x-2">
+                <Link href="/anime" className="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-all">Anime</Link>
+                <Link href="/bollywood" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all hidden 2xl:block">Bollywood</Link>
+                <Link href="/cartoons" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all hidden xl:block">Cartoons</Link>
+                <Link href="/drama" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all hidden xl:block">Drama</Link>
+                <Link href="/hollywood" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all hidden xl:block">Hollywood</Link>
+                <Link href="/movies" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all">Movies</Link>
+                <Link href="/tv" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all">TV Shows</Link>
               </div>
             </div>
           </div>
           
           <div className="hidden lg:flex items-center space-x-4 xl:space-x-6">
-            <form onSubmit={handleSearch} className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search movies, tv..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="bg-white/5 border border-white/10 text-white text-sm rounded-full focus:ring-vortex-purple focus:border-vortex-purple block w-48 xl:w-64 pl-10 p-2 transition-all placeholder-gray-400 focus:bg-white/10"
+            <div ref={searchRef} className="relative">
+              <form onSubmit={handleSearch} className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search movies, tv..."
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setActiveIndex(-1);
+                  }}
+                  onFocus={() => query.trim().length >= 2 && setShowSuggestions(true)}
+                  onKeyDown={handleKeyDown}
+                  className="bg-white/5 border border-white/10 text-white text-sm rounded-full focus:ring-vortex-purple focus:border-vortex-purple block w-32 xl:w-48 2xl:w-64 pl-10 p-2 transition-all placeholder-gray-400 focus:bg-white/10"
+                />
+              </form>
+              <SearchSuggestions 
+                suggestions={suggestions} 
+                isVisible={showSuggestions} 
+                activeIndex={activeIndex}
+                onSelect={handleSelectSuggestion}
+                isLoading={isLoading}
+                query={query}
               />
-            </form>
+            </div>
             
             {/* Genres between Search and Download */}
-            <Link href="/genres" className="flex items-center gap-1.5 px-4 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 hover:text-white rounded-lg text-sm font-bold transition-all">
+            <Link href="/genres" className="flex items-center gap-1.5 px-2 xl:px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 hover:text-white rounded-lg text-[13px] xl:text-sm font-bold transition-all">
                 <LayoutGrid className="h-4 w-4" />
-                <span>Genres</span>
+                <span className="hidden 2xl:inline">Genres</span>
             </Link>
 
             <DownloadAppButton />
@@ -86,19 +171,33 @@ export default function Navbar() {
       {/* Mobile Search Overlay */}
       {isSearchOpen && (
         <div className="lg:hidden bg-vortex-black border-b border-white/10 p-4 animate-in slide-in-from-top duration-300">
-           <form onSubmit={handleSearch} className="relative w-full">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                autoFocus
-                placeholder="Search Vortex..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="bg-white/5 border border-white/10 text-white text-sm rounded-full focus:ring-vortex-purple focus:border-vortex-purple block w-full pl-10 p-3 transition-all placeholder-gray-400 focus:bg-white/10"
+           <div ref={mobileSearchRef} className="relative w-full">
+             <form onSubmit={handleSearch} className="relative w-full">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Search Vortex..."
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setActiveIndex(-1);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  className="bg-white/5 border border-white/10 text-white text-sm rounded-full focus:ring-vortex-purple focus:border-vortex-purple block w-full pl-10 p-3 transition-all placeholder-gray-400 focus:bg-white/10"
+                />
+              </form>
+              <SearchSuggestions 
+                suggestions={suggestions} 
+                isVisible={showSuggestions} 
+                activeIndex={activeIndex}
+                onSelect={handleSelectSuggestion}
+                isLoading={isLoading}
+                query={query}
               />
-            </form>
+           </div>
         </div>
       )}
 
@@ -120,3 +219,4 @@ export default function Navbar() {
     </nav>
   );
 }
+

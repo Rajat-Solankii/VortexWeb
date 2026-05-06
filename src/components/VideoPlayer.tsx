@@ -22,33 +22,12 @@ export default function VideoPlayer({ type, id, season, episode, title }: { type
     <div className="space-y-4">
       {/* Video Container */}
       <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(124,77,255,0.15)] border border-white/10 relative">
-        {server === 3 ? (
-            <div className="w-full h-full bg-gradient-to-br from-red-900/20 via-black to-black flex flex-col items-center justify-center p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
-                <div className="w-12 h-12 sm:w-20 sm:h-20 bg-red-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(220,38,38,0.5)]">
-                    <Play className="h-6 w-6 sm:h-10 sm:w-10 text-white fill-white ml-0.5 sm:ml-1" />
-                </div>
-                <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-white mb-1 sm:mb-2 uppercase tracking-tight">Watch on YouTube</h3>
-                    <p className="text-gray-400 sm:text-gray-300 text-[10px] sm:text-sm max-w-sm px-2">Direct embedding is restricted for this content. Tap below to find the full episode on YouTube.</p>
-                </div>
-                <a 
-                    href={`https://www.youtube.com/results?search_query=${youtubeQuery}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl transition-all shadow-xl uppercase tracking-widest text-[10px] sm:text-xs"
-                >
-                    <Search className="h-3.5 w-3.5 sm:h-4 w-4" />
-                    <span>Search YouTube</span>
-                </a>
-            </div>
-        ) : (
-            <iframe
-            src={url}
-            allowFullScreen
-            className="w-full h-full absolute inset-0"
-            style={{ border: "none" }}
-            ></iframe>
-        )}
+        <iframe
+          src={url}
+          allowFullScreen
+          className="w-full h-full absolute inset-0"
+          style={{ border: "none" }}
+        ></iframe>
       </div>
 
       {/* Server Switcher */}
@@ -56,10 +35,10 @@ export default function VideoPlayer({ type, id, season, episode, title }: { type
          <div className="flex flex-col">
             <div className="flex items-center justify-between mb-4">
                 <span className="text-[10px] font-black text-vortex-purple uppercase tracking-[0.3em] drop-shadow-sm">Playback Engines</span>
-                <span className="text-[10px] font-bold text-white/80 uppercase tracking-wider">3 Optimized Servers Active</span>
+                <span className="text-[10px] font-bold text-white/80 uppercase tracking-wider">2 Optimized Servers Active</span>
             </div>
             
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
                 <button 
                     onClick={() => setServer(1)}
                     className={`py-3.5 rounded-xl text-[11px] font-black transition-all border ${server === 1 ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.3)] scale-[1.02]' : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 hover:text-white'}`}
@@ -72,12 +51,6 @@ export default function VideoPlayer({ type, id, season, episode, title }: { type
                 >
                     SERVER 2
                 </button>
-                <button 
-                    onClick={() => setServer(3)}
-                    className={`py-3.5 rounded-xl text-[11px] font-black transition-all border ${server === 3 ? 'bg-red-600 text-white border-red-600 shadow-[0_0_25px_rgba(220,38,38,0.5)] scale-[1.02]' : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 hover:text-white'}`}
-                >
-                    YOUTUBE
-                </button>
             </div>
          </div>
       </div>
@@ -89,7 +62,7 @@ export default function VideoPlayer({ type, id, season, episode, title }: { type
         </div>
         <p className="text-[11px] text-gray-200 leading-relaxed">
             <span className="text-white font-bold uppercase tracking-wider mr-1">Pro Tip:</span>
-            Switch to <span className="text-white font-black underline decoration-vortex-purple underline-offset-2">Server 2</span> if Server 1 is slow. Use <span className="text-red-500 font-black">YouTube</span> for regional cartoons like Motu Patlu.
+            Switch to <span className="text-white font-black underline decoration-vortex-purple underline-offset-2">Server 2</span> if Server 1 is slow or failing to load content.
         </p>
       </div>
     </div>

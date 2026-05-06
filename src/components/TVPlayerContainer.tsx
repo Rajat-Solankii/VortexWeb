@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import VideoPlayer from "./VideoPlayer";
 import EpisodeSelector from "./EpisodeSelector";
 import HistoryTracker from "./HistoryTracker";
-import DownloadMediaButton from "./DownloadMediaButton";
 
 function TVPlayerContent({ id, tv }: { id: string, tv: any }) {
   const router = useRouter();
@@ -37,7 +36,6 @@ function TVPlayerContent({ id, tv }: { id: string, tv: any }) {
         <h2 className="text-2xl font-bold text-white">
           Watch S{season} E{episode}
         </h2>
-        <DownloadMediaButton type="tv" id={id} season={season} episode={episode} title={tv.name} />
       </div>
       <VideoPlayer type="tv" id={id} season={season} episode={episode} title={tv.name} />
       

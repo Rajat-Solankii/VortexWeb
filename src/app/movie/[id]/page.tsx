@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 import HistoryTracker from "@/components/HistoryTracker";
-import DownloadMediaButton from "@/components/DownloadMediaButton";
 import CastSection from "@/components/CastSection";
 import BackButton from "@/components/BackButton";
 import VideoPlayer from "@/components/VideoPlayer";
@@ -20,7 +19,7 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
   if (!movie) return <div className="text-white text-center py-20">Movie not found.</div>;
 
   const now = new Date().toISOString().split('T')[0];
-  const isNotReleased = movie.release_date && movie.release_date > now;
+  const isNotReleased = (movie.release_date && movie.release_date > now) || (movie.status && movie.status !== "Released");
 
   return (
     <div>
@@ -52,28 +51,42 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
              </div>
              
              <div className="w-full flex-1 min-w-0 flex flex-col justify-start max-w-6xl">
-                <div className="flex items-center justify-between mb-4">
-                   <h2 className="text-2xl font-bold text-white">Watch Now</h2>
-                   {!isNotReleased && <DownloadMediaButton type="movie" id={id} title={movie.title} />}
-                </div>
-                 {isNotReleased ? (
-                    <div className="w-full aspect-video bg-vortex-black/40 border border-white/10 rounded-2xl flex flex-col items-center justify-center text-center p-8 space-y-4">
-                      <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
-                        <span className="text-4xl">⏳</span>
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-white mb-2">Not Released Yet</h3>
-                        <p className="text-gray-400 max-w-md">This title is scheduled for release on <span className="text-vortex-purple font-medium">{movie.release_date}</span>. Stay tuned!</p>
-                      </div>
+                 {!isNotReleased && (
+                    <div className="flex items-center justify-between mb-4">
+                       <h2 className="text-2xl font-bold text-white">Watch Now</h2>
                     </div>
-                  ) : (
-                    <VideoPlayer type="movie" id={id} title={movie.title} />
-                  )}
-                 <TrailerPlayer trailers={trailers} />
-                 <CastSection cast={cast} />
+                 )}
+                 
+                  {isNotReleased ? (
+                     <div className="w-full aspect-video bg-vortex-black/40 border border-white/10 rounded-3xl flex flex-col items-center justify-center text-center p-8 space-y-6 shadow-2xl backdrop-blur-sm mb-8 overflow-hidden relative">
+                       <div className="absolute inset-0 bg-vortex-purple/5 animate-pulse"></div>
+                       <div className="w-20 h-20 bg-vortex-purple/20 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(124,77,255,0.3)] border border-vortex-purple/30 z-10">
+                         <span className="text-5xl animate-bounce">⏳</span>
+                       </div>
+                       <div className="z-10">
+                         <h3 className="text-3xl font-black text-white mb-3 tracking-tighter uppercase">Not Released Yet</h3>
+                         <div className="h-1 w-20 bg-vortex-purple mx-auto mb-4 rounded-full"></div>
+                         <p className="text-gray-400 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
+                            This title is currently <span className="text-vortex-blue font-bold uppercase">{movie.status || "Planned"}</span>. 
+                            Scheduled for release on <span className="text-vortex-purple font-black">{movie.release_date || "TBA"}</span>. 
+                            Stay tuned to Vortex!
+                         </p>
+                       </div>
+                     </div>
+                   ) : (
+                     <VideoPlayer type="movie" id={id} title={movie.title} />
+                   )}
+                  
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                       <span className="w-1.5 h-6 bg-vortex-purple rounded-full"></span>
+                       Trailers & Clips
+                    </h2>
+                    <TrailerPlayer trailers={trailers} />
+                  </div>
+                  
+                  <CastSection cast={cast} />
               </div>
-
-
           </div>
        </div>
 

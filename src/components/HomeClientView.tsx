@@ -1,10 +1,7 @@
-"use client";
-import { useState } from "react";
 import MediaRow from "@/components/MediaRow";
 import RecentlyPlayedRow from "@/components/RecentlyPlayedRow";
 import AdsterraBanner300 from "@/components/AdsterraBanner300";
-
-type Mode = "all" | "movies" | "tv" | "anime";
+import SupportBanner from "@/components/SupportBanner";
 
 export default function HomeClientView({
   trending,
@@ -29,90 +26,23 @@ export default function HomeClientView({
   bollywood: any[];
   upcoming: any[];
 }) {
-  const [mode, setMode] = useState<Mode>("all");
-
   return (
-    <div className="relative z-10">
-      
-      {/* Category Toggles - High priority z-index to prevent hero overlap */}
-      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 px-4 sm:px-6 lg:px-10 xl:px-16 mb-10 -mt-8 md:mt-0 relative z-40 pointer-events-auto">
-        <button 
-          type="button"
-          onClick={() => setMode("all")}
-          className={`px-6 py-2 rounded-full text-sm font-bold transition-all shadow-xl border ${mode === "all" ? "bg-white text-black border-white scale-105" : "bg-white/5 text-white border-white/10 hover:bg-white/20"}`}
-        >
-          All
-        </button>
-        <button 
-          type="button"
-          onClick={() => setMode("movies")}
-          className={`px-6 py-2 rounded-full text-sm font-bold transition-all shadow-xl border ${mode === "movies" ? "bg-white text-black border-white scale-105" : "bg-white/5 text-white border-white/10 hover:bg-white/20"}`}
-        >
-          Movies
-        </button>
-        <button 
-          type="button"
-          onClick={() => setMode("tv")}
-          className={`px-6 py-2 rounded-full text-sm font-bold transition-all shadow-xl border ${mode === "tv" ? "bg-white text-black border-white scale-105" : "bg-white/5 text-white border-white/10 hover:bg-white/20"}`}
-        >
-          TV Shows
-        </button>
-        <button 
-          type="button"
-          onClick={() => setMode("anime")}
-          className={`px-6 py-2 rounded-full text-sm font-bold transition-all shadow-xl border ${mode === "anime" ? "bg-white text-black border-white scale-105" : "bg-white/5 text-white border-white/10 hover:bg-white/20"}`}
-        >
-          Anime
-        </button>
-      </div>
-
+    <div className="relative z-10 pt-4">
+      <SupportBanner />
       {/* Rows Container */}
       <div className="animate-in fade-in duration-500">
-        {(mode === "all" || mode === "movies" || mode === "tv" || mode === "anime") && (
-            <RecentlyPlayedRow />
-        )}
-        
-        {(mode === "all") && (
-            <MediaRow title="Trending Today" items={trending?.slice(1)} />
-        )}
-        
-        {(mode === "all" || mode === "movies") && (
-            <MediaRow title="Popular Movies" items={popularMovies} />
-        )}
-
-        {(mode === "all" || mode === "movies") && (
-            <MediaRow title="Bollywood Blockbusters" items={bollywood} />
-        )}
-        
-        {mode === "all" && <AdsterraBanner300 />}
-        
-        {(mode === "all" || mode === "movies") && (
-            <MediaRow title="Coming Soon" items={upcoming} />
-        )}
-
-        {(mode === "all" || mode === "tv") && (
-            <MediaRow title="Heart-Racing K-Dramas" items={kDramas} />
-        )}
-
-        {(mode === "all" || mode === "tv") && (
-            <MediaRow title="Top Rated TV Shows" items={topRatedTV} />
-        )}
-
-        {(mode === "all" || mode === "tv") && (
-            <MediaRow title="Turkish Delights" items={turkishDramas} />
-        )}
-        
-        {(mode === "all" || mode === "anime") && (
-            <MediaRow title="Trending Anime" items={anime} />
-        )}
-
-        {(mode === "all" || mode === "tv") && (
-            <MediaRow title="Chinese Epics" items={chineseDramas} />
-        )}
-
-        {(mode === "all" || mode === "tv") && (
-            <MediaRow title="Filipino Favorites" items={philippineDramas} />
-        )}
+        <RecentlyPlayedRow />
+        <MediaRow title="Trending Today" items={trending?.slice(1)} />
+        <MediaRow title="Popular Movies" items={popularMovies} />
+        <MediaRow title="Bollywood Blockbusters" items={bollywood} />
+        <AdsterraBanner300 />
+        <MediaRow title="Coming Soon" items={upcoming} />
+        <MediaRow title="Heart-Racing K-Dramas" items={kDramas} />
+        <MediaRow title="Top Rated TV Shows" items={topRatedTV} />
+        <MediaRow title="Turkish Delights" items={turkishDramas} />
+        <MediaRow title="Trending Anime" items={anime} />
+        <MediaRow title="Chinese Epics" items={chineseDramas} />
+        <MediaRow title="Filipino Favorites" items={philippineDramas} />
       </div>
     </div>
   );

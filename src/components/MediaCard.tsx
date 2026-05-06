@@ -12,7 +12,7 @@ export default function MediaCard({ item, onRemove }: { item: TMDBItem, onRemove
   const now = new Date().toISOString().split('T')[0];
   const releaseDate = item.release_date || item.first_air_date;
   const isComingSoon = releaseDate && releaseDate > now;
-  
+
   return (
     <div className="relative group w-[140px] md:w-[180px] flex-shrink-0">
       <Link href={link} className="block">

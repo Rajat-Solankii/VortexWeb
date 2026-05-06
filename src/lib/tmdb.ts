@@ -16,6 +16,8 @@ export interface TMDBItem {
   adult?: boolean;
   genre_ids?: number[];
   vote_count?: number;
+  popularity?: number;
+  _score?: number;
 }
 
 export interface TMDBResponse {

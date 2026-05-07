@@ -1,6 +1,6 @@
 import MediaRow from "@/components/MediaRow";
 import RecentlyPlayedRow from "@/components/RecentlyPlayedRow";
-import AdsterraBanner300 from "@/components/AdsterraBanner300";
+
 import SupportBanner from "@/components/SupportBanner";
 
 export default function HomeClientView({
@@ -35,7 +35,7 @@ export default function HomeClientView({
         <MediaRow title="Trending Today" items={trending?.slice(1)} />
         <MediaRow title="Popular Movies" items={popularMovies} />
         <MediaRow title="Bollywood Blockbusters" items={bollywood} />
-        <AdsterraBanner300 />
+
         <MediaRow title="Coming Soon" items={upcoming} />
         <MediaRow title="Heart-Racing K-Dramas" items={kDramas} />
         <MediaRow title="Top Rated TV Shows" items={topRatedTV} />

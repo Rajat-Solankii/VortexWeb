@@ -1,8 +1,6 @@
 import MediaRow from "@/components/MediaRow";
 import RecentlyPlayedRow from "@/components/RecentlyPlayedRow";
 
-import SupportBanner from "@/components/SupportBanner";
-
 export default function HomeClientView({
   trending,
   popularMovies,
@@ -28,7 +26,6 @@ export default function HomeClientView({
 }) {
   return (
     <div className="relative z-10 pt-4">
-      <SupportBanner />
       {/* Rows Container */}
       <div className="animate-in fade-in duration-500">
         <RecentlyPlayedRow />

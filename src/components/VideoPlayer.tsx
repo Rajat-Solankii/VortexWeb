@@ -2,19 +2,21 @@
 import { useState } from "react";
 import { Search, Play, Info } from "lucide-react";
 
-export default function VideoPlayer({ type, id, season, episode, title }: { type: "movie" | "tv", id: string, season?: number, episode?: number, title?: string }) {
+export default function VideoPlayer({ type, id, season, episode, title, tmdbSeason, tmdbEpisode }: { type: "movie" | "tv", id: string, season?: number, episode?: number, title?: string, tmdbSeason?: number, tmdbEpisode?: number }) {
   const [server, setServer] = useState(1);
 
   let url = "";
-  const s = season || 1;
-  const e = episode || 1;
-  const youtubeQuery = encodeURIComponent(`${title || ""} full episode ${type === 'tv' ? `season ${s} episode ${e}` : ''}`);
+  // Use TMDB-specific season/episode if provided (vital for flattened anime), otherwise fallback to UI season/episode
+  const s = tmdbSeason ?? season ?? 1;
+  const e = tmdbEpisode ?? episode ?? 1;
+
+  const videasyParams = 'nextEpisode=true&autoplayNextEpisode=true&episodeSelector=true&overlay=true&color=8B5CF6';
 
   if (type === "movie") {
-    if (server === 1) url = `https://player.videasy.net/movie/${id}`;
+    if (server === 1) url = `https://player.videasy.net/movie/${id}?${videasyParams}`;
     else if (server === 2) url = `https://vidsrc.xyz/embed/movie?tmdb=${id}`;
   } else {
-    if (server === 1) url = `https://player.videasy.net/tv/${id}/${s}/${e}`;
+    if (server === 1) url = `https://player.videasy.net/tv/${id}/${s}/${e}?${videasyParams}`;
     else if (server === 2) url = `https://vidsrc.xyz/embed/tv?tmdb=${id}&sea=${s}&epi=${e}`;
   }
 

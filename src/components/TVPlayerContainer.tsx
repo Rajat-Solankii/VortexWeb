@@ -5,27 +5,58 @@ import VideoPlayer from "./VideoPlayer";
 import EpisodeSelector from "./EpisodeSelector";
 import HistoryTracker from "./HistoryTracker";
 
-function TVPlayerContent({ id, tv }: { id: string, tv: any }) {
+interface AnimeSeasons {
+  seasons: { season_number: number; episode_count: number; name: string }[];
+  episodeMap: Record<number, any[]>;
+}
+
+function TVPlayerContent({ id, tv, isAnimeShow, animeSeasons }: { id: string, tv: any, isAnimeShow?: boolean, animeSeasons?: AnimeSeasons | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const seasons = tv?.seasons || [];
-  const validSeasons = seasons?.filter((s: any) => s.season_number > 0) || [];
+  // Use anime episode group seasons if available, otherwise default TMDB seasons
+  const effectiveSeasons = animeSeasons?.seasons || tv?.seasons || [];
+  const validSeasons = effectiveSeasons?.filter((s: any) => s.season_number > 0) || [];
   const initialSeason = validSeasons.length > 0 ? validSeasons[0].season_number : 1;
   
   const [season, setSeason] = useState(initialSeason);
   const [episode, setEpisode] = useState(1);
+  // For anime, we need the absolute episode number for the video player
+  const [absoluteEpisode, setAbsoluteEpisode] = useState(1);
+
 
   useEffect(() => {
     const s = searchParams.get("s");
     const e = searchParams.get("e");
     
     if (s) setSeason(parseInt(s, 10));
-    if (e) setEpisode(parseInt(e, 10));
-  }, [searchParams]);
+    if (e) {
+      const epNum = parseInt(e, 10);
+      setEpisode(epNum);
+      
+      // For anime with episode groups, calculate absolute episode number
+      if (isAnimeShow && animeSeasons?.episodeMap) {
+        const seasonEps = animeSeasons.episodeMap[parseInt(s || String(initialSeason), 10)];
+        if (seasonEps && seasonEps[epNum - 1]) {
+          setAbsoluteEpisode(seasonEps[epNum - 1].original_episode_number);
+        } else {
+          setAbsoluteEpisode(epNum);
+        }
+      } else {
+        setAbsoluteEpisode(epNum);
+      }
+    }
+  }, [searchParams, isAnimeShow, animeSeasons, initialSeason]);
 
-  const handleEpisodeSelect = (s: number, e: number) => {
+  const handleEpisodeSelect = (s: number, e: number, absEp?: number) => {
     router.push(`/tv/${id}?s=${s}&e=${e}`, { scroll: false });
+    setSeason(s);
+    setEpisode(e);
+    if (absEp !== undefined) {
+      setAbsoluteEpisode(absEp);
+    } else {
+      setAbsoluteEpisode(e);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -37,21 +68,31 @@ function TVPlayerContent({ id, tv }: { id: string, tv: any }) {
           Watch S{season} E{episode}
         </h2>
       </div>
-      <VideoPlayer type="tv" id={id} season={season} episode={episode} title={tv.name} />
+      <VideoPlayer 
+        type="tv" 
+        id={id} 
+        season={season} 
+        episode={episode} 
+        title={tv.name}
+        tmdbSeason={isAnimeShow && animeSeasons ? 1 : season}
+        tmdbEpisode={isAnimeShow && animeSeasons ? absoluteEpisode : episode}
+      />
       
       <EpisodeSelector 
          tvId={id}
-         seasons={seasons} 
-         onSelect={handleEpisodeSelect} 
+         seasons={effectiveSeasons} 
+         onSelect={handleEpisodeSelect}
+         animeEpisodeMap={animeSeasons?.episodeMap}
+         isAnime={isAnimeShow}
       />
     </div>
   );
 }
 
-export default function TVPlayerContainer({ id, tv }: { id: string, tv: any }) {
+export default function TVPlayerContainer({ id, tv, isAnimeShow, animeSeasons }: { id: string, tv: any, isAnimeShow?: boolean, animeSeasons?: AnimeSeasons | null }) {
   return (
     <Suspense fallback={<div className="w-full aspect-video bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-gray-500">Loading Player...</div>}>
-      <TVPlayerContent id={id} tv={tv} />
+      <TVPlayerContent id={id} tv={tv} isAnimeShow={isAnimeShow} animeSeasons={animeSeasons} />
     </Suspense>
   );
 }

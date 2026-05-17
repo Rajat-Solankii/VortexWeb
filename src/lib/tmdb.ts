@@ -290,6 +290,31 @@ export async function getTVDetails(id: string) {
   return await fetchTMDB(`tv/${id}`);
 }
 
+/**
+ * Detect if a TV show is anime based on its metadata.
+ * Checks for Animation genre (16) + Japanese original language.
+ */
+export function isAnime(tv: any): boolean {
+  if (!tv) return false;
+  const isJapanese = tv.original_language === 'ja';
+  const hasAnimationGenre = tv.genres?.some((g: any) => g.id === 16) || false;
+  return isJapanese && hasAnimationGenre;
+}
+
+/**
+ * Look up the AniList ID for an anime by title.
+ * Uses our /api/anilist route to query AniList's GraphQL API.
+ */
+export async function getAniListId(title: string): Promise<number | null> {
+  try {
+    const res = await fetch(`/api/anilist?title=${encodeURIComponent(title)}`);
+    const data = await res.json();
+    return data?.anilistId || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getMovieRecommendations(id: string) {
   const data = await fetchTMDB(`movie/${id}/recommendations?include_adult=false&${CACHE_BUST}`);
   return cleanData(data?.results || [], true);
@@ -367,6 +392,68 @@ export async function getGenres(type: "movie" | "tv") {
 
 export async function getTVSeason(id: string, season: number) {
   return await fetchTMDB(`tv/${id}/season/${season}`);
+}
+
+// Episode Groups API for anime with flattened seasons
+export async function getEpisodeGroups(tvId: string) {
+  return await fetchTMDB(`tv/${tvId}/episode_groups`);
+}
+
+export async function getEpisodeGroupDetails(groupId: string) {
+  return await fetchTMDB(`tv/episode_group/${groupId}`);
+}
+
+/**
+ * For anime that TMDB flattens into a single season, this finds the
+ * "Seasons" episode group and returns properly structured season data.
+ * Returns null if no episode group is found or the show isn't flattened.
+ */
+export async function getAnimeSeasonsFromEpisodeGroups(tvId: string, seasons: any[]) {
+  // Only attempt this for shows with 1 real season (flattened anime)
+  const realSeasons = seasons?.filter((s: any) => s.season_number > 0) || [];
+  if (realSeasons.length !== 1) return null;
+  
+  try {
+    const groupsData = await getEpisodeGroups(tvId);
+    const groups = groupsData?.results || [];
+    
+    // Look for a "Seasons" type group (type 6 = Seasons order)
+    const seasonsGroup = groups.find((g: any) => g.type === 6 && g.group_count > 1);
+    if (!seasonsGroup) return null;
+    
+    const details = await getEpisodeGroupDetails(seasonsGroup.id);
+    if (!details?.groups) return null;
+    
+    // Filter out specials (order 0 typically) and sort by order
+    const seasonGroups = details.groups
+      .filter((g: any) => g.name !== 'Specials' && g.episodes?.length > 0)
+      .sort((a: any, b: any) => a.order - b.order);
+    
+    if (seasonGroups.length <= 1) return null;
+    
+    // Transform into the format EpisodeSelector expects
+    const transformedSeasons = seasonGroups.map((g: any, idx: number) => ({
+      season_number: idx + 1,
+      episode_count: g.episodes.length,
+      name: g.name || `Season ${idx + 1}`,
+    }));
+    
+    // Build a map of season episodes with re-numbered episode_numbers
+    const episodeMap: Record<number, any[]> = {};
+    seasonGroups.forEach((g: any, idx: number) => {
+      const seasonNum = idx + 1;
+      episodeMap[seasonNum] = g.episodes.map((ep: any, epIdx: number) => ({
+        ...ep,
+        episode_number: epIdx + 1, // Re-number within season
+        original_episode_number: ep.episode_number, // Keep absolute number
+      }));
+    });
+    
+    return { seasons: transformedSeasons, episodeMap };
+  } catch (error) {
+    console.error('Failed to fetch episode groups:', error);
+    return null;
+  }
 }
 
 export async function discoverByGenre(type: "movie" | "tv", genreId: string, sortBy: string = "popularity.desc", page: number = 1) {

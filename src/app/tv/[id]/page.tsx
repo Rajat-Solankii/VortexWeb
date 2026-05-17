@@ -4,7 +4,7 @@ import MediaRow from "@/components/MediaRow";
 import CastSection from "@/components/CastSection";
 import BackButton from "@/components/BackButton";
 import TrailerPlayer from "@/components/TrailerPlayer";
-import { getTVDetails, getTVRecommendations, getCredits, getVideos } from "@/lib/tmdb";
+import { getTVDetails, getTVRecommendations, getCredits, getVideos, isAnime, getAnimeSeasonsFromEpisodeGroups } from "@/lib/tmdb";
 
 export default async function TVDetailsPage({ params }: { params: Promise<{ id: string }> }) {
    const { id } = await params;
@@ -19,6 +19,18 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
 
    const now = new Date().toISOString().split('T')[0];
    const isNotReleased = tv.first_air_date && tv.first_air_date > now;
+
+   // Detect anime and fetch proper seasons from episode groups if flattened
+   const isAnimeShow = isAnime(tv);
+   let animeSeasons = null;
+   if (isAnimeShow) {
+      animeSeasons = await getAnimeSeasonsFromEpisodeGroups(id, tv.seasons || []);
+   }
+
+   // Use episode group seasons if available, otherwise fall back to default
+   const displaySeasonCount = animeSeasons 
+      ? animeSeasons.seasons.length 
+      : tv.number_of_seasons;
 
    return (
       <div>
@@ -38,7 +50,7 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
                   <div className="flex items-center space-x-4 text-sm text-gray-400 mb-4">
                      <span>{tv.first_air_date?.split('-')[0]}</span>
                      <span className="flex items-center text-vortex-purple"><span className="mr-1">★</span> {tv.vote_average?.toFixed(1)}</span>
-                     <span>{tv.number_of_seasons} Seasons</span>
+                     <span>{displaySeasonCount} Seasons</span>
                   </div>
                   <div className="flex flex-wrap gap-2 mb-6 justify-center lg:justify-start">
                      {tv.genres?.map((g: any) => (
@@ -60,7 +72,7 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
                         </div>
                      </div>
                   ) : (
-                     <TVPlayerContainer id={id} tv={tv} />
+                     <TVPlayerContainer id={id} tv={tv} isAnimeShow={isAnimeShow} animeSeasons={animeSeasons} />
                   )}
                   <TrailerPlayer trailers={trailers} />
                   <CastSection cast={cast} />
@@ -75,3 +87,4 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
       </div>
    );
 }
+

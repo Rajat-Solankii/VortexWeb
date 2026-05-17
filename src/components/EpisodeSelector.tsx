@@ -13,13 +13,20 @@ interface Season {
 interface Episode {
   id: number;
   episode_number: number;
+  original_episode_number?: number;
   name: string;
   overview: string;
   still_path: string | null;
   air_date: string;
 }
 
-export default function EpisodeSelector({ tvId, seasons, onSelect }: { tvId: string, seasons: Season[], onSelect: (s: number, e: number) => void }) {
+export default function EpisodeSelector({ tvId, seasons, onSelect, animeEpisodeMap, isAnime }: { 
+  tvId: string, 
+  seasons: Season[], 
+  onSelect: (s: number, e: number, absEp?: number) => void,
+  animeEpisodeMap?: Record<number, any[]> | null,
+  isAnime?: boolean
+}) {
   const validSeasons = seasons?.filter(s => s.season_number > 0) || [];
   const [selectedSeason, setSelectedSeason] = useState(validSeasons[0]?.season_number || 1);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
@@ -29,14 +36,23 @@ export default function EpisodeSelector({ tvId, seasons, onSelect }: { tvId: str
     async function loadSeason() {
       setLoading(true);
       try {
-        const data = await getTVSeason(tvId, selectedSeason);
-        const allEpisodes = data?.episodes || [];
-        
-        // Only show episodes that have already aired
-        const now = new Date().toISOString().split('T')[0];
-        const releasedEpisodes = allEpisodes.filter((ep: Episode) => ep.air_date && ep.air_date <= now);
-        
-        setEpisodes(releasedEpisodes);
+        // If we have anime episode map (from episode groups), use that directly
+        if (isAnime && animeEpisodeMap && animeEpisodeMap[selectedSeason]) {
+          const eps = animeEpisodeMap[selectedSeason];
+          const now = new Date().toISOString().split('T')[0];
+          const releasedEpisodes = eps.filter((ep: Episode) => ep.air_date && ep.air_date <= now);
+          setEpisodes(releasedEpisodes);
+        } else {
+          // Default: fetch from TMDB season API
+          const data = await getTVSeason(tvId, selectedSeason);
+          const allEpisodes = data?.episodes || [];
+          
+          // Only show episodes that have already aired
+          const now = new Date().toISOString().split('T')[0];
+          const releasedEpisodes = allEpisodes.filter((ep: Episode) => ep.air_date && ep.air_date <= now);
+          
+          setEpisodes(releasedEpisodes);
+        }
       } catch (error) {
         console.error("Failed to load episodes", error);
       } finally {
@@ -44,7 +60,7 @@ export default function EpisodeSelector({ tvId, seasons, onSelect }: { tvId: str
       }
     }
     loadSeason();
-  }, [tvId, selectedSeason]);
+  }, [tvId, selectedSeason, isAnime, animeEpisodeMap]);
 
   if (validSeasons.length === 0) return null;
 
@@ -80,7 +96,7 @@ export default function EpisodeSelector({ tvId, seasons, onSelect }: { tvId: str
             {episodes.map((ep) => (
               <button
                 key={ep.id}
-                onClick={() => onSelect(selectedSeason, ep.episode_number)}
+                onClick={() => onSelect(selectedSeason, ep.episode_number, ep.original_episode_number)}
                 className="flex items-start bg-white/5 hover:bg-white/10 border border-white/10 hover:border-vortex-purple/50 rounded-xl overflow-hidden text-left transition-all group"
               >
                 <div className="w-32 sm:w-40 flex-shrink-0 aspect-video relative">

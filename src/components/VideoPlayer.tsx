@@ -25,6 +25,7 @@ export default function VideoPlayer({ type, id, season, episode, title }: { type
         <iframe
           src={url}
           allowFullScreen
+          sandbox="allow-same-origin allow-scripts"
           className="w-full h-full absolute inset-0"
           style={{ border: "none" }}
         ></iframe>

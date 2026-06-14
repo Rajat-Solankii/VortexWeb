@@ -74,8 +74,8 @@ function TVPlayerContent({ id, tv, isAnimeShow, animeSeasons }: { id: string, tv
         season={season} 
         episode={episode} 
         title={tv.name}
-        tmdbSeason={isAnimeShow && animeSeasons ? 1 : season}
-        tmdbEpisode={isAnimeShow && animeSeasons ? absoluteEpisode : episode}
+        tmdbSeason={season}
+        tmdbEpisode={episode}
       />
       
       <EpisodeSelector 

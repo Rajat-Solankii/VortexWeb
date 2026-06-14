@@ -18,11 +18,11 @@ export default async function Home() {
     getUpcomingMovies(),
   ]);
 
-  const heroItem = trending?.[0] || popularMovies?.[0] || null;
+  const heroItems = trending?.length ? trending.slice(0, 5) : popularMovies?.slice(0, 5) || [];
 
   return (
     <div className="pb-12 -mt-16">
-      <HeroSection item={heroItem} />
+      <HeroSection items={heroItems} />
        <HomeClientView 
          trending={trending}
          popularMovies={popularMovies}

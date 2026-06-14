@@ -27,7 +27,6 @@ export default function VideoPlayer({ type, id, season, episode, title, tmdbSeas
         <iframe
           src={url}
           allowFullScreen
-
           className="w-full h-full absolute inset-0"
           style={{ border: "none" }}
         ></iframe>

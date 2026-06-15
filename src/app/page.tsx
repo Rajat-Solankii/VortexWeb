@@ -1,5 +1,6 @@
 import HeroSection from "@/components/HeroSection";
 import HomeClientView from "@/components/HomeClientView";
+import AndroidAppBanner from "@/components/AndroidAppBanner";
 import { getTrending, getPopularMovies, getTopRatedTVShows, getTrendingAnime, getKDramas, getTurkishDramas, getChineseDramas, getPhilippineDramas, getBollywoodMovies, getUpcomingMovies } from "@/lib/tmdb";
 
 export const revalidate = 3600;
@@ -23,6 +24,7 @@ export default async function Home() {
   return (
     <div className="pb-12 -mt-16">
       <HeroSection items={heroItems} />
+      <AndroidAppBanner />
        <HomeClientView 
          trending={trending}
          popularMovies={popularMovies}

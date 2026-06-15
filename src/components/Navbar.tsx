@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { Search, Menu, X, LayoutGrid } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import DownloadAppButton from "./DownloadAppButton";
 import SearchSuggestions from "./SearchSuggestions";
 import { searchMulti, TMDBItem } from "@/lib/tmdb";
@@ -153,24 +154,35 @@ export default function Navbar() {
           <div className="lg:hidden flex items-center gap-2">
              <button 
                onClick={() => setIsSearchOpen(!isSearchOpen)}
-               className="p-2 text-gray-400 hover:text-white"
+               className="p-2 text-gray-400 hover:text-white relative w-10 h-10 flex items-center justify-center"
+               aria-label="Toggle search"
              >
-               {isSearchOpen ? <X className="h-6 w-6" /> : <Search className="h-6 w-6" />}
+               <Search className={`absolute h-6 w-6 transition-all duration-300 ${isSearchOpen ? 'rotate-90 opacity-0 scale-50' : 'rotate-0 opacity-100 scale-100'}`} />
+               <X className={`absolute h-6 w-6 transition-all duration-300 ${isSearchOpen ? 'rotate-0 opacity-100 scale-100' : '-rotate-90 opacity-0 scale-50'}`} />
              </button>
              <div className="scale-75 -mx-2"><DownloadAppButton /></div>
              <button
                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-               className="p-2 text-gray-400 hover:text-white"
+               className="p-2 text-gray-400 hover:text-white relative w-10 h-10 flex items-center justify-center"
+               aria-label="Toggle mobile menu"
              >
-               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+               <Menu className={`absolute h-6 w-6 transition-all duration-300 ${isMobileMenuOpen ? 'rotate-90 opacity-0 scale-50' : 'rotate-0 opacity-100 scale-100'}`} />
+               <X className={`absolute h-6 w-6 transition-all duration-300 ${isMobileMenuOpen ? 'rotate-0 opacity-100 scale-100' : '-rotate-90 opacity-0 scale-50'}`} />
              </button>
           </div>
         </div>
       </div>
       
       {/* Mobile Search Overlay */}
-      {isSearchOpen && (
-        <div className="lg:hidden bg-vortex-black border-b border-white/10 p-4 animate-in slide-in-from-top duration-300">
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden bg-vortex-black border-b border-white/10 p-4"
+          >
            <div ref={mobileSearchRef} className="relative w-full">
              <form onSubmit={handleSearch} className="relative w-full">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -198,12 +210,20 @@ export default function Navbar() {
                 query={query}
               />
            </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden bg-vortex-black/95 backdrop-blur-xl border-b border-white/10 px-4 pt-6 pb-8 space-y-8 animate-in fade-in duration-300">
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden bg-vortex-black/95 backdrop-blur-xl border-b border-white/10 px-4 pt-6 pb-8 space-y-8"
+          >
             <div className="grid grid-cols-2 gap-4">
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/anime" className="text-gray-300 hover:text-white font-medium p-3 bg-white/5 rounded-xl text-center border border-white/5">Anime</Link>
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/bollywood" className="text-gray-300 hover:text-white font-medium p-3 bg-white/5 rounded-xl text-center border border-white/5">Bollywood</Link>
@@ -214,8 +234,9 @@ export default function Navbar() {
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/tv" className="text-gray-300 hover:text-white font-medium p-3 bg-white/5 rounded-xl text-center border border-white/5">TV Shows</Link>
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/genres" className="text-white font-bold p-3 bg-vortex-purple/20 rounded-xl text-center border border-vortex-purple/40">Genres</Link>
             </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

@@ -32,7 +32,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head />
+      <head>
+        <link rel="preconnect" href="https://player.videasy.net" />
+        <link rel="dns-prefetch" href="https://player.videasy.net" />
+      </head>
       <body className="min-h-full flex flex-col bg-black">
         <Navbar />
         <main className="flex-grow pt-16">

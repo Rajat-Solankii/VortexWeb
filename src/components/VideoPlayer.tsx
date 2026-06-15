@@ -29,17 +29,22 @@ export default function VideoPlayer({ type, id, season, episode, title, tmdbSeas
       
       {/* Information Note */}
       <div className="flex items-start space-x-3 p-4 bg-white/5 rounded-2xl border border-white/10 shadow-inner group">
-        <div className="mt-0.5">
-           <Info className="h-4 w-4 text-vortex-purple" />
+        <div className="mt-0.5 flex-shrink-0">
+           <Info className="h-5 w-5 text-vortex-purple" />
         </div>
-        <p className="text-[12px] text-gray-300 leading-relaxed flex items-center flex-wrap">
-            <span className="text-white font-bold uppercase tracking-wider mr-2">Note:</span>
-            If the video is not playing, try changing the server from the 
-            <span className="inline-flex items-center justify-center bg-zinc-800 w-6 h-6 rounded-full mx-1.5 shadow-sm border border-white/5">
-              <Cloud className="w-3.5 h-3.5 text-white" fill="currentColor" strokeWidth={1.5} />
-            </span> 
-            inside the player.
-        </p>
+        <div className="text-[13px] text-gray-300 leading-relaxed">
+            <p className="mb-2">
+              <span className="text-white font-bold uppercase tracking-wider mr-2 text-[12px]">Note:</span>
+              If the video is not playing, try changing the server from the 
+              <span className="inline-flex items-center justify-center bg-zinc-800 w-6 h-6 rounded-full mx-1.5 shadow-sm border border-white/5 align-middle">
+                <Cloud className="w-3.5 h-3.5 text-white" fill="currentColor" strokeWidth={1.5} />
+              </span> 
+              inside the player.
+            </p>
+            <p className="text-[12px] text-gray-400">
+              <strong className="text-gray-300">Mobile Data Buffering?</strong> Mobile carriers often intentionally throttle video streaming speeds. If you experience buffering on mobile data but not on Wi-Fi, try connecting to Wi-Fi, using a free VPN (like 1.1.1.1), or switching the player's server above.
+            </p>
+        </div>
       </div>
     </div>
   );

@@ -27,7 +27,6 @@ export default function VideoPlayer({ type, id, season, episode, title, tmdbSeas
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           loading="eager"
-          fetchPriority="high"
           referrerPolicy="no-referrer-when-downgrade"
           className="w-full h-full absolute inset-0"
           style={{ border: "none" }}

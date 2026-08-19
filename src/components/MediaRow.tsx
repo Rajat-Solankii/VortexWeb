@@ -45,11 +45,11 @@ export default function MediaRow({
         {action}
       </div>
       
-      <div className="relative px-4 sm:px-6 lg:px-10 xl:px-16">
+      <div className="relative">
         {/* Left Arrow */}
         <button 
           onClick={() => scroll("left")}
-          className={`absolute left-4 sm:left-6 lg:left-10 xl:left-16 top-0 bottom-4 w-12 sm:w-16 z-40 bg-black/50 hover:bg-black/80 items-center justify-center text-white transition-all opacity-0 group-hover/row:opacity-100 hidden ${isMoved ? 'md:flex' : ''}`}
+          className={`absolute left-0 top-0 bottom-4 w-12 sm:w-16 z-40 bg-black/50 hover:bg-black/80 items-center justify-center text-white transition-all opacity-0 group-hover/row:opacity-100 hidden ${isMoved ? 'md:flex' : ''}`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -60,7 +60,7 @@ export default function MediaRow({
         <div 
           ref={rowRef}
           onScroll={handleScroll}
-          className="flex overflow-x-auto gap-4 md:gap-6 pb-4 scrollbar-hide snap-x relative z-10"
+          className="flex overflow-x-auto gap-4 md:gap-6 pb-4 px-4 sm:px-6 lg:px-10 xl:px-16 scrollbar-hide snap-x relative z-10"
         >
           {items.map((item) => (
             <div key={item.id} className="snap-start">
@@ -72,7 +72,7 @@ export default function MediaRow({
         {/* Right Arrow */}
         <button 
           onClick={() => scroll("right")}
-          className="absolute right-4 sm:right-6 lg:right-10 xl:right-16 top-0 bottom-4 w-12 sm:w-16 z-40 bg-black/50 hover:bg-black/80 items-center justify-center text-white transition-all opacity-0 group-hover/row:opacity-100 hidden md:flex"
+          className="absolute right-0 top-0 bottom-4 w-12 sm:w-16 z-40 bg-black/50 hover:bg-black/80 items-center justify-center text-white transition-all opacity-0 group-hover/row:opacity-100 hidden md:flex"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

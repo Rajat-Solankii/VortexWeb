@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 
 export default function Footer() {
@@ -15,7 +16,7 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-12 text-sm">
+        <div className="grid grid-cols-2 gap-12 sm:gap-24 text-sm">
           <div className="flex flex-col gap-3">
             <h3 className="text-white font-semibold mb-1">Navigation</h3>
             <Link href="/movies" className="text-white/60 hover:text-white transition-colors">Movies</Link>
@@ -33,11 +34,6 @@ export default function Footer() {
             <Link href="/dmca" className="text-white/60 hover:text-white transition-colors">DMCA</Link>
             <Link href="/terms" className="text-white/60 hover:text-white transition-colors">Terms of Service</Link>
             <Link href="/privacy" className="text-white/60 hover:text-white transition-colors">Privacy Policy</Link>
-          </div>
-
-          <div className="flex flex-col gap-3 col-span-2 sm:col-span-1">
-            <h3 className="text-white font-semibold mb-1">Support</h3>
-            <Link href="mailto:watchvortexofficial@gmail.com" className="text-white/60 hover:text-white transition-colors">Contact Us</Link>
           </div>
         </div>
       </div>

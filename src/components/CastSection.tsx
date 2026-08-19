@@ -14,9 +14,9 @@ export default function CastSection({ cast }: { cast: CastMember[] }) {
   return (
     <div className="mt-12">
       <h2 className="text-2xl font-bold text-white mb-6">Series Cast</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
         {cast.map((member) => (
-          <div key={member.id} className="bg-white/5 rounded-xl overflow-hidden border border-white/10 hover:border-vortex-purple/50 transition-all group">
+          <div key={member.id} className="flex-shrink-0 w-36 sm:w-40 bg-white/5 rounded-xl overflow-hidden border border-white/10 hover:border-vortex-purple/50 transition-all group">
             <div className="aspect-[2/3] relative overflow-hidden">
               {member.profile_path ? (
                 <img 

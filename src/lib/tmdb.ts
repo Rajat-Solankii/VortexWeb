@@ -1,6 +1,6 @@
 const BASE_URL = "https://vortex-proxy-six.vercel.app/api/tmdb";
-const WITHOUT_ADULT_KEYWORDS = "12113,190370,181827,12053,155455,155456,155457,234333"; 
-const CACHE_BUST = "v=4"; 
+const WITHOUT_ADULT_KEYWORDS = "12113,190370,181827,12053,155455,155456,155457,234333";
+const CACHE_BUST = "v=4";
 
 export interface TMDBItem {
   id: number;
@@ -31,11 +31,11 @@ export async function fetchTMDB(path: string, params: Record<string, string> = {
   let fullPath = path;
   const searchParams = new URLSearchParams(params);
   const paramString = searchParams.toString();
-  
+
   if (paramString) {
     fullPath += (fullPath.includes('?') ? '&' : '?') + paramString;
   }
-  
+
   const proxyPath = fullPath.replace('?', '&');
   const url = `${BASE_URL}?path=${proxyPath}`;
 
@@ -59,7 +59,7 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
   const now = new Date().toISOString().split('T')[0];
 
   const ADULT_KEYWORDS = [
-    "hentai", "ecchi", "erotica", "sexual content", "nudity", 
+    "hentai", "ecchi", "erotica", "sexual content", "nudity",
     "uncensored", "sexual", "sex", "adult animation", "porn",
     "joshiochi", "sweet punishment", "overflow", "redo of healer",
     "isekai meikyū", "harem in the labyrinth", "world's end harem"
@@ -68,7 +68,7 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
   const ADULT_TITLES = [
     "overflow", "sweet punishment", "redo of healer", "yosuga no sora",
     "high school dxd", "shimoneta", "prison school", "joshiochi",
-    "my wife is the student council president", "kiss x sis", 
+    "my wife is the student council president", "kiss x sis",
     "monster musume", "to love ru", "testament of sister new devil",
     "labyrinth of another world", "harem in the labyrinth",
     "world's end harem", "valkyrie drive", "freezing", "seikon no qwaser"
@@ -83,7 +83,7 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
   return items.filter(item => {
     // Media Type Filter: Only allow movies and tv shows
     if (item.media_type && !["movie", "tv"].includes(item.media_type)) return false;
-    
+
     // Quality Filter: Must have title/name and poster/backdrop
     if (!(item.title || item.name)) return false;
     if (!item.poster_path || !item.backdrop_path) return false;
@@ -100,10 +100,10 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
     // Playability check: Ensure it has been released (unless we allow unreleased)
     const releaseDate = item.release_date || item.first_air_date;
     if (!allowUnreleased && releaseDate && releaseDate > now) return false;
-    
+
     const voteCount = item.vote_count || 0;
     if (strict && !lenient && voteCount < 10) return false;
-    if (lenient && voteCount < 0) return false; 
+    if (lenient && voteCount < 0) return false;
 
     // Filter out unplayable genres (News, Talk)
     const genreIds = item.genre_ids || [];
@@ -165,10 +165,10 @@ function getLevenshteinDistance(a: string, b: string): number {
 async function getGoogleCorrection(query: string): Promise<string | null> {
   try {
     const isBrowser = typeof window !== "undefined";
-    const url = isBrowser 
+    const url = isBrowser
       ? `/api/suggestions?q=${encodeURIComponent(query)}`
       : `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}`;
-    
+
     const res = await fetch(url);
     const data = await res.json();
     // Google returns [query, [suggestions]]
@@ -185,19 +185,19 @@ async function getGoogleCorrection(query: string): Promise<string | null> {
 }
 
 export async function searchMulti(query: string, includeAdult: boolean = true, isForced: boolean = false) {
-  const adultFlag = "true"; 
+  const adultFlag = "true";
   const cleanQuery = query.toLowerCase().trim();
   const words = cleanQuery.split(/\s+/);
   let correctedQuery: string | undefined;
-  
+
   // 1. Initial search
   let [page1, page2] = await Promise.all([
     fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=1&include_adult=${adultFlag}`),
     fetchTMDB(`search/multi?query=${encodeURIComponent(query)}&page=2&include_adult=${adultFlag}`)
   ]);
-  
+
   let combined = [...(page1?.results || []), ...(page2?.results || [])];
-  
+
   // 2. Fallback for typos (Google-like correction)
   if (combined.length === 0 && !isForced) {
     const correction = await getGoogleCorrection(query);
@@ -215,15 +215,15 @@ export async function searchMulti(query: string, includeAdult: boolean = true, i
   if (combined.length === 0 && words.length > 1) {
     const fallback2Word = words.slice(0, 2).join(" ");
     const fallback1Word = words[0];
-    
+
     const [data2, data1] = await Promise.all([
       fetchTMDB(`search/multi?query=${encodeURIComponent(fallback2Word)}&page=1&include_adult=${adultFlag}`),
       fetchTMDB(`search/multi?query=${encodeURIComponent(fallback1Word)}&page=1&include_adult=${adultFlag}`)
     ]);
-    
+
     combined = [...(data2?.results || []), ...(data1?.results || [])];
   }
-  
+
   // Deduplicate results
   const seenIds = new Set();
   const uniqueCombined = combined.filter(item => {
@@ -233,23 +233,23 @@ export async function searchMulti(query: string, includeAdult: boolean = true, i
   });
 
   // Clean and filter
-  let cleaned = cleanData(uniqueCombined, false, true, true); 
+  let cleaned = cleanData(uniqueCombined, false, true, true);
 
   // Re-rank based on relevance (levenshtein) and popularity
   const ranked = cleaned.map(item => {
     const title = (item.title || item.name || "").toLowerCase();
     const distance = getLevenshteinDistance(cleanQuery, title);
-    
+
     // Exact matches get a huge boost
     const isExact = title.includes(cleanQuery);
     // Partial word matches
     const containsAnyWord = words.some(w => w.length > 2 && title.includes(w));
-    
-    const score = (isExact ? 1000 : 0) + 
-                  (containsAnyWord ? 200 : 0) + 
-                  (item.popularity || 0) / 10 - 
-                  distance * 5;
-    
+
+    const score = (isExact ? 1000 : 0) +
+      (containsAnyWord ? 200 : 0) +
+      (item.popularity || 0) / 10 -
+      distance * 5;
+
     return { ...item, _score: score };
   });
 
@@ -279,7 +279,7 @@ export async function getPhilippineDramas() {
 
 export async function getCredits(type: "movie" | "tv", id: string) {
   const data = await fetchTMDB(`${type}/${id}/credits`);
-  return data?.cast?.slice(0, 12) || []; 
+  return data?.cast?.slice(0, 12) || [];
 }
 
 export async function getMovieDetails(id: string) {
@@ -412,32 +412,32 @@ export async function getAnimeSeasonsFromEpisodeGroups(tvId: string, seasons: an
   // Only attempt this for shows with 1 real season (flattened anime)
   const realSeasons = seasons?.filter((s: any) => s.season_number > 0) || [];
   if (realSeasons.length !== 1) return null;
-  
+
   try {
     const groupsData = await getEpisodeGroups(tvId);
     const groups = groupsData?.results || [];
-    
+
     // Look for a "Seasons" type group (type 6 = Seasons order)
     const seasonsGroup = groups.find((g: any) => g.type === 6 && g.group_count > 1);
     if (!seasonsGroup) return null;
-    
+
     const details = await getEpisodeGroupDetails(seasonsGroup.id);
     if (!details?.groups) return null;
-    
+
     // Filter out specials (order 0 typically) and sort by order
     const seasonGroups = details.groups
       .filter((g: any) => g.name !== 'Specials' && g.episodes?.length > 0)
       .sort((a: any, b: any) => a.order - b.order);
-    
+
     if (seasonGroups.length <= 1) return null;
-    
+
     // Transform into the format EpisodeSelector expects
     const transformedSeasons = seasonGroups.map((g: any, idx: number) => ({
       season_number: idx + 1,
       episode_count: g.episodes.length,
       name: g.name || `Season ${idx + 1}`,
     }));
-    
+
     // Build a map of season episodes with re-numbered episode_numbers
     const episodeMap: Record<number, any[]> = {};
     seasonGroups.forEach((g: any, idx: number) => {
@@ -448,7 +448,7 @@ export async function getAnimeSeasonsFromEpisodeGroups(tvId: string, seasons: an
         original_episode_number: ep.episode_number, // Keep absolute number
       }));
     });
-    
+
     return { seasons: transformedSeasons, episodeMap };
   } catch (error) {
     console.error('Failed to fetch episode groups:', error);
@@ -483,21 +483,21 @@ export async function discoverCartoons(sortBy: string = "popularity.desc", page:
     fetchTMDB(`discover/tv?with_genres=16,10762&with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
     fetchTMDB(`discover/tv?with_genres=16,10762&with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
-  
+
   const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
   return { results: cleanData(results, true, false, true) };
 }
 
 export async function getAllDramas(sortBy: string = "popularity.desc", page: number = 1, lang?: string, allowUnreleased: boolean = false) {
   const languages = lang || "ko|tr|zh|tl";
-  
+
   const [p1, p2, p3, p4] = await Promise.all([
     fetchTMDB(`discover/tv?with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
     fetchTMDB(`discover/tv?with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
     fetchTMDB(`discover/tv?with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
     fetchTMDB(`discover/tv?with_original_language=${languages}&sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
-  
+
   const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
   return { results: cleanData(results, true, allowUnreleased, true) };
 }

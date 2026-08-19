@@ -18,10 +18,17 @@ export default function VideoPlayer({ type, id, season, episode, title, tmdbSeas
   return (
     <div className="space-y-4">
       {/* Video Container */}
-      <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(124,77,255,0.15)] border border-white/10 relative">
+      <div 
+        className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(124,77,255,0.15)] border border-white/10 relative"
+        style={{ transform: 'translateZ(0)', willChange: 'transform', backfaceVisibility: 'hidden' }}
+      >
         <iframe
           src={url}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
+          loading="eager"
+          fetchPriority="high"
+          referrerPolicy="no-referrer-when-downgrade"
           className="w-full h-full absolute inset-0"
           style={{ border: "none" }}
         ></iframe>

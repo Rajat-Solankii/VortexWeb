@@ -34,7 +34,11 @@ export default function RootLayout({
     >
       <head>
         <link rel="preconnect" href="https://player.videasy.net" />
+        <link rel="preconnect" href="https://moon.peakstorm.top" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cedarorbit.top" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://player.videasy.net" />
+        <link rel="dns-prefetch" href="https://moon.peakstorm.top" />
+        <link rel="dns-prefetch" href="https://cedarorbit.top" />
       </head>
       <body className="min-h-full flex flex-col bg-black">
         <Navbar />

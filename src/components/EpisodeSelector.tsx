@@ -92,37 +92,39 @@ export default function EpisodeSelector({ tvId, seasons, onSelect, animeEpisodeM
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {episodes.map((ep) => (
-              <button
-                key={ep.id}
-                onClick={() => onSelect(selectedSeason, ep.episode_number, ep.original_episode_number)}
-                className="flex items-start bg-white/5 hover:bg-white/10 border border-white/10 hover:border-vortex-purple/50 rounded-xl overflow-hidden text-left transition-all group"
-              >
-                <div className="w-32 sm:w-40 flex-shrink-0 aspect-video relative">
-                  {ep.still_path ? (
-                    <img 
-                      src={`https://image.tmdb.org/t/p/w300${ep.still_path}`} 
-                      alt={ep.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-vortex-black/60 flex items-center justify-center text-xs text-gray-600">No Image</div>
-                  )}
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Play className="w-8 h-8 text-white fill-current" />
+          <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
+              {episodes.map((ep) => (
+                <button
+                  key={ep.id}
+                  onClick={() => onSelect(selectedSeason, ep.episode_number, ep.original_episode_number)}
+                  className="flex items-start bg-white/5 hover:bg-white/10 border border-white/10 hover:border-vortex-purple/50 rounded-xl overflow-hidden text-left transition-all group"
+                >
+                  <div className="w-32 sm:w-40 flex-shrink-0 aspect-video relative">
+                    {ep.still_path ? (
+                      <img 
+                        src={`https://image.tmdb.org/t/p/w300${ep.still_path}`} 
+                        alt={ep.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-vortex-black/60 flex items-center justify-center text-xs text-gray-600">No Image</div>
+                    )}
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Play className="w-8 h-8 text-white fill-current" />
+                    </div>
+                    <div className="absolute bottom-2 right-2 bg-black/80 px-1.5 py-0.5 rounded text-[10px] text-white">
+                      EP {ep.episode_number}
+                    </div>
                   </div>
-                  <div className="absolute bottom-2 right-2 bg-black/80 px-1.5 py-0.5 rounded text-[10px] text-white">
-                    EP {ep.episode_number}
+                  <div className="p-3 min-w-0">
+                    <h4 className="text-sm font-bold text-white truncate group-hover:text-vortex-purple transition-colors">{ep.name}</h4>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">{ep.overview || "No description available."}</p>
+                    <p className="text-[10px] text-gray-600 mt-2">{ep.air_date}</p>
                   </div>
-                </div>
-                <div className="p-3 min-w-0">
-                  <h4 className="text-sm font-bold text-white truncate group-hover:text-vortex-purple transition-colors">{ep.name}</h4>
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">{ep.overview || "No description available."}</p>
-                  <p className="text-[10px] text-gray-600 mt-2">{ep.air_date}</p>
-                </div>
-              </button>
-            ))}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>

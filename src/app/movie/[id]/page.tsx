@@ -6,6 +6,40 @@ import VideoPlayer from "@/components/VideoPlayer";
 import TrailerPlayer from "@/components/TrailerPlayer";
 import MediaRow from "@/components/MediaRow";
 import { getMovieDetails, getMovieRecommendations, getCredits, getVideos } from "@/lib/tmdb";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const movie = await getMovieDetails(id);
+
+  if (!movie) {
+    return { title: 'Movie Not Found | Vortex' };
+  }
+
+  const title = `${movie.title} | Vortex`;
+  const description = movie.overview;
+  const imageUrl = movie.backdrop_path
+    ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`
+    : movie.poster_path
+      ? `https://image.tmdb.org/t/p/w780${movie.poster_path}`
+      : '/loader-logo.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [imageUrl],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
+    }
+  };
+}
 
 export default async function MovieDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

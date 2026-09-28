@@ -5,6 +5,40 @@ import CastSection from "@/components/CastSection";
 import BackButton from "@/components/BackButton";
 import TrailerPlayer from "@/components/TrailerPlayer";
 import { getTVDetails, getTVRecommendations, getCredits, getVideos, isAnime, getAnimeSeasonsFromEpisodeGroups } from "@/lib/tmdb";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const tv = await getTVDetails(id);
+
+  if (!tv) {
+    return { title: 'TV Show Not Found | Vortex' };
+  }
+
+  const title = `${tv.name} | Vortex`;
+  const description = tv.overview;
+  const imageUrl = tv.backdrop_path
+    ? `https://image.tmdb.org/t/p/w1280${tv.backdrop_path}`
+    : tv.poster_path
+      ? `https://image.tmdb.org/t/p/w780${tv.poster_path}`
+      : '/loader-logo.jpg';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [imageUrl],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
+    }
+  };
+}
 
 export default async function TVDetailsPage({ params }: { params: Promise<{ id: string }> }) {
    const { id } = await params;

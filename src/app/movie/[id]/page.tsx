@@ -74,7 +74,7 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
                        </div>
                      </div>
                    ) : (
-                     <VideoPlayer type="movie" id={id} title={movie.title} />
+                     <VideoPlayer type="movie" id={id} title={movie.title} posterPath={movie.poster_path} />
                    )}
                   
                   <div className="space-y-4">

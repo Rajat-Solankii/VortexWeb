@@ -39,17 +39,26 @@ export async function fetchTMDB(path: string, params: Record<string, string> = {
   const proxyPath = fullPath.replace('?', '&');
   const url = `${BASE_URL}?path=${proxyPath}`;
 
-  try {
-    const res = await fetch(url, { next: { revalidate: 0 } });
-    if (!res.ok) {
-      console.error(`Failed to fetch TMDB data: ${res.status} ${res.statusText}`);
-      return null;
+  for (let i = 0; i < 3; i++) {
+    try {
+      const res = await fetch(url, { 
+        next: { revalidate: 0 },
+        signal: AbortSignal.timeout(8000) // 8 second timeout to prevent hanging
+      });
+      
+      if (!res.ok) {
+        console.error(`Failed to fetch TMDB data (Attempt ${i + 1}): ${res.status} ${res.statusText}`);
+        if (res.status >= 500 && i < 2) continue; // Retry on server errors
+        return null;
+      }
+      return await res.json();
+    } catch (error) {
+      console.error(`Error fetching TMDB (Attempt ${i + 1}):`, error);
+      if (i === 2) return null;
+      await new Promise(resolve => setTimeout(resolve, 800)); // wait 800ms before retry
     }
-    return await res.json();
-  } catch (error) {
-    console.error("Error fetching TMDB:", error);
-    return null;
   }
+  return null;
 }
 
 // Utility to filter out junk results

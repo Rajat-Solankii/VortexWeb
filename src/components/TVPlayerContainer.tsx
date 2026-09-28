@@ -13,12 +13,12 @@ interface AnimeSeasons {
 function TVPlayerContent({ id, tv, isAnimeShow, animeSeasons, anilistId }: { id: string, tv: any, isAnimeShow?: boolean, animeSeasons?: AnimeSeasons | null, anilistId?: number | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // Use anime episode group seasons if available, otherwise default TMDB seasons
   const effectiveSeasons = animeSeasons?.seasons || tv?.seasons || [];
   const validSeasons = effectiveSeasons?.filter((s: any) => s.season_number > 0) || [];
   const initialSeason = validSeasons.length > 0 ? validSeasons[0].season_number : 1;
-  
+
   const [season, setSeason] = useState(initialSeason);
   const [episode, setEpisode] = useState(1);
   // For anime, we need the absolute episode number for the video player
@@ -28,12 +28,12 @@ function TVPlayerContent({ id, tv, isAnimeShow, animeSeasons, anilistId }: { id:
   useEffect(() => {
     const s = searchParams.get("s");
     const e = searchParams.get("e");
-    
+
     if (s) setSeason(parseInt(s, 10));
     if (e) {
       const epNum = parseInt(e, 10);
       setEpisode(epNum);
-      
+
       // For anime with episode groups, calculate absolute episode number
       if (isAnimeShow && animeSeasons?.episodeMap) {
         const seasonEps = animeSeasons.episodeMap[parseInt(s || String(initialSeason), 10)];
@@ -68,24 +68,25 @@ function TVPlayerContent({ id, tv, isAnimeShow, animeSeasons, anilistId }: { id:
           Watch S{season} E{episode}
         </h2>
       </div>
-      <VideoPlayer 
-        type="tv" 
-        id={id} 
-        season={season} 
-        episode={episode} 
+      <VideoPlayer
+        type="tv"
+        id={id}
+        season={season}
+        episode={episode}
         title={tv.name}
+        posterPath={tv.poster_path}
         tmdbSeason={season}
         tmdbEpisode={episode}
         absoluteEpisode={absoluteEpisode}
         anilistId={anilistId}
       />
-      
-      <EpisodeSelector 
-         tvId={id}
-         seasons={effectiveSeasons} 
-         onSelect={handleEpisodeSelect}
-         animeEpisodeMap={animeSeasons?.episodeMap}
-         isAnime={isAnimeShow}
+
+      <EpisodeSelector
+        tvId={id}
+        seasons={effectiveSeasons}
+        onSelect={handleEpisodeSelect}
+        animeEpisodeMap={animeSeasons?.episodeMap}
+        isAnime={isAnimeShow}
       />
     </div>
   );

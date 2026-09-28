@@ -23,8 +23,11 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
    // Detect anime and fetch proper seasons from episode groups if flattened
    const isAnimeShow = isAnime(tv);
    let animeSeasons = null;
+   let anilistId = null;
    if (isAnimeShow) {
       animeSeasons = await getAnimeSeasonsFromEpisodeGroups(id, tv.seasons || []);
+      const { getAniListId } = await import("@/lib/tmdb");
+      anilistId = await getAniListId(tv.name);
    }
 
    // Use episode group seasons if available, otherwise fall back to default
@@ -72,7 +75,7 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
                         </div>
                      </div>
                   ) : (
-                     <TVPlayerContainer id={id} tv={tv} isAnimeShow={isAnimeShow} animeSeasons={animeSeasons} />
+                     <TVPlayerContainer id={id} tv={tv} isAnimeShow={isAnimeShow} animeSeasons={animeSeasons} anilistId={anilistId} />
                   )}
                   <TrailerPlayer trailers={trailers} />
                   <CastSection cast={cast} />

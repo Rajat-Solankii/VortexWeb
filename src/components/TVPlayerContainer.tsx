@@ -10,7 +10,7 @@ interface AnimeSeasons {
   episodeMap: Record<number, any[]>;
 }
 
-function TVPlayerContent({ id, tv, isAnimeShow, animeSeasons }: { id: string, tv: any, isAnimeShow?: boolean, animeSeasons?: AnimeSeasons | null }) {
+function TVPlayerContent({ id, tv, isAnimeShow, animeSeasons, anilistId }: { id: string, tv: any, isAnimeShow?: boolean, animeSeasons?: AnimeSeasons | null, anilistId?: number | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -76,6 +76,8 @@ function TVPlayerContent({ id, tv, isAnimeShow, animeSeasons }: { id: string, tv
         title={tv.name}
         tmdbSeason={season}
         tmdbEpisode={episode}
+        absoluteEpisode={absoluteEpisode}
+        anilistId={anilistId}
       />
       
       <EpisodeSelector 
@@ -89,10 +91,10 @@ function TVPlayerContent({ id, tv, isAnimeShow, animeSeasons }: { id: string, tv
   );
 }
 
-export default function TVPlayerContainer({ id, tv, isAnimeShow, animeSeasons }: { id: string, tv: any, isAnimeShow?: boolean, animeSeasons?: AnimeSeasons | null }) {
+export default function TVPlayerContainer({ id, tv, isAnimeShow, animeSeasons, anilistId }: { id: string, tv: any, isAnimeShow?: boolean, animeSeasons?: AnimeSeasons | null, anilistId?: number | null }) {
   return (
     <Suspense fallback={<div className="w-full aspect-video bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-gray-500">Loading Player...</div>}>
-      <TVPlayerContent id={id} tv={tv} isAnimeShow={isAnimeShow} animeSeasons={animeSeasons} />
+      <TVPlayerContent id={id} tv={tv} isAnimeShow={isAnimeShow} animeSeasons={animeSeasons} anilistId={anilistId} />
     </Suspense>
   );
 }

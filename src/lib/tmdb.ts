@@ -307,10 +307,22 @@ export function isAnime(tv: any): boolean {
  */
 export async function getAniListId(title: string): Promise<number | null> {
   try {
-    const res = await fetch(`/api/anilist?title=${encodeURIComponent(title)}`);
+    const query = `
+      query ($search: String) {
+        Media(search: $search, type: ANIME, format_in: [TV, TV_SHORT, ONA]) {
+          id
+        }
+      }
+    `;
+    const res = await fetch("https://graphql.anilist.co", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, variables: { search: title } }),
+    });
     const data = await res.json();
-    return data?.anilistId || null;
-  } catch {
+    return data?.data?.Media?.id || null;
+  } catch (error) {
+    console.error("AniList lookup error:", error);
     return null;
   }
 }

@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: [
           {
+            // Allow iframes from our specific streaming servers
+            key: "Content-Security-Policy",
+            value: "frame-src 'self' https://nhdapi.com https://player.videasy.net https://vidvault.to https://vaplayer.ru;"
+          },
+          {
             // Block popups & top-level navigation from embedded iframes.
             // Only allow our own origin and trusted embed sources.
             key: "Permissions-Policy",

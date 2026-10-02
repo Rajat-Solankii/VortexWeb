@@ -155,7 +155,7 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           loading="eager"
-          referrerPolicy="no-referrer-when-downgrade"
+          referrerPolicy="same-origin"
           className="w-full h-full absolute inset-0"
           style={{ border: "none" }}
           onLoad={() => {

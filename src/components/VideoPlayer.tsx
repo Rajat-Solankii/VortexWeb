@@ -5,22 +5,8 @@ import { useState, useEffect, useRef } from "react";
 export default function VideoPlayer({ type, id, season, episode, title, posterPath, tmdbSeason, tmdbEpisode, anilistId, absoluteEpisode }: { type: "movie" | "tv", id: string, season?: number, episode?: number, title?: string, posterPath?: string, tmdbSeason?: number, tmdbEpisode?: number, anilistId?: number | null, absoluteEpisode?: number }) {
   const [activeServer, setActiveServer] = useState<"ythd" | "nxsha" | "rozgarlelo" | "vixsrc" | "vidcore" | "vidrock" | "primesrc">("ythd");
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [imdbId, setImdbId] = useState<string | null>(null);
   let url = "";
   let downloadUrl = "";
-
-  useEffect(() => {
-    if (activeServer === "primesrc" && !imdbId) {
-      fetch(`https://vortex-proxy-six.vercel.app/api/tmdb?path=${type}/${id}/external_ids`)
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.imdb_id) {
-            setImdbId(data.imdb_id);
-          }
-        })
-        .catch(err => console.error(err));
-    }
-  }, [activeServer, id, type, imdbId]);
 
   // Use TMDB-specific season/episode if provided (vital for flattened anime), otherwise fallback to UI season/episode
   const s = tmdbSeason ?? season ?? 1;
@@ -107,9 +93,9 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
     }
   } else if (activeServer === "primesrc") {
     if (type === "movie") {
-      url = imdbId ? `https://primesrc.me/embed/movie?imdb=${imdbId}` : `https://primesrc.me/embed/movie?tmdb=${id}`;
+      url = `https://primesrc.me/embed/movie?tmdb=${id}`;
     } else {
-      url = imdbId ? `https://primesrc.me/embed/tv?imdb=${imdbId}&season=${s}&episode=${e}` : `https://primesrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
+      url = `https://primesrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
     }
   }
 

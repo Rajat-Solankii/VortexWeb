@@ -55,6 +55,35 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
     };
   }, [title, type, s, e, posterPath]);
 
+  // Handle 'f' key for fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input field
+      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      if (e.key === 'f' || e.key === 'F') {
+        // Toggle fullscreen on the iframe container for best results
+        const container = iframeRef.current?.parentElement;
+        if (container) {
+          if (!document.fullscreenElement) {
+            container.requestFullscreen().catch((err) => {
+              console.error("Error attempting to enable fullscreen:", err);
+            });
+          } else {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            }
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   if (activeServer === "ythd") {
     if (type === "movie") {
       url = `https://ythd.org/embed/${id}`;

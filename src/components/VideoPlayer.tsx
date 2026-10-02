@@ -3,7 +3,7 @@ import { Info, Cloud, Server, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export default function VideoPlayer({ type, id, season, episode, title, posterPath, tmdbSeason, tmdbEpisode, anilistId, absoluteEpisode }: { type: "movie" | "tv", id: string, season?: number, episode?: number, title?: string, posterPath?: string, tmdbSeason?: number, tmdbEpisode?: number, anilistId?: number | null, absoluteEpisode?: number }) {
-  const [activeServer, setActiveServer] = useState<"ythd" | "nxsha" | "rozgarlelo" | "vixsrc" | "vidcore" | "vidrock" | "primesrc">("ythd");
+  const [activeServer, setActiveServer] = useState<"ythd" | "nxsha" | "rozgarlelo" | "vixsrc" | "vidcore" | "vidrock" | "primesrc">("nxsha");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   let url = "";
   let downloadUrl = "";
@@ -115,13 +115,13 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
               onChange={(e) => setActiveServer(e.target.value as any)}
               className="bg-black border border-white/10 text-gray-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-vortex-purple focus:ring-1 focus:ring-vortex-purple transition-all"
             >
-              <option value="ythd">Server 1 (YTHD)</option>
-              <option value="nxsha">Server 2 (Nxsha - Multi)</option>
-              <option value="rozgarlelo">Server 3 (Rozgarlelo - Multi)</option>
-              <option value="vixsrc">Server 4 (Vixsrc)</option>
-              <option value="vidcore">Server 5 (Vidcore)</option>
-              <option value="vidrock">Server 6 (Vidrock)</option>
-              <option value="primesrc">Server 7 (Primesrc)</option>
+              <option value="nxsha">Server 1 (Multi Language)</option>
+              <option value="rozgarlelo">Server 2 (Multi Language)</option>
+              <option value="primesrc">Server 3</option>
+              <option value="ythd">Server 4</option>
+              <option value="vixsrc">Server 5</option>
+              <option value="vidcore">Server 6</option>
+              <option value="vidrock">Server 7</option>
             </select>
           </div>
           <p className="text-xs text-gray-500 italic max-w-sm">

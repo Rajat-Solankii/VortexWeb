@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { Search, Menu, X, LayoutGrid } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import DownloadAppButton from "./DownloadAppButton";
 import SignInButton from "./SignInButton";
@@ -18,8 +18,10 @@ export default function Navbar() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const router = useRouter();
+  const pathname = usePathname();
   const searchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
+
 
   // Debounced search
   useEffect(() => {
@@ -92,12 +94,16 @@ export default function Navbar() {
     }
   };
 
+  if (pathname === "/") {
+    return null;
+  }
+
   return (
     <nav className="fixed top-0 w-full z-50 bg-vortex-black/80 backdrop-blur-md border-b border-white/10">
       <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16 mx-auto">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
-            <Link href="/" className="text-2xl font-black text-vortex-purple tracking-tighter drop-shadow-[0_0_10px_rgba(124,77,255,0.8)]">
+            <Link href="/home" className="text-2xl font-black text-vortex-purple tracking-tighter drop-shadow-[0_0_10px_rgba(124,77,255,0.8)]">
               VORTEX
             </Link>
             {/* Alphabetical Links */}

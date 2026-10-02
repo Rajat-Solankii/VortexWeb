@@ -89,7 +89,13 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
     "concept trailer", "unauthorized", "full movie in"
   ];
 
+  const seenIds = new Set<number>();
+  
   return items.filter(item => {
+    // Deduplicate by ID
+    if (seenIds.has(item.id)) return false;
+    seenIds.add(item.id);
+
     // Media Type Filter: Only allow movies and tv shows
     if (item.media_type && !["movie", "tv"].includes(item.media_type)) return false;
 
@@ -130,23 +136,47 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
 }
 
 export async function getTrending() {
-  const data = await fetchTMDB(`trending/all/week?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  return cleanData(data?.results || [], true);
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`trending/all/week?page=1&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`trending/all/week?page=2&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`trending/all/week?page=3&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`trending/all/week?page=4&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return cleanData(results, true);
 }
 
 export async function getPopularMovies() {
-  const data = await fetchTMDB(`movie/popular?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  return cleanData(data?.results || [], true);
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`movie/popular?page=1&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`movie/popular?page=2&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`movie/popular?page=3&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`movie/popular?page=4&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return cleanData(results, true);
 }
 
 export async function getTopRatedTVShows() {
-  const data = await fetchTMDB(`tv/top_rated?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  return cleanData(data?.results || [], true);
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`tv/top_rated?page=1&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`tv/top_rated?page=2&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`tv/top_rated?page=3&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`tv/top_rated?page=4&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return cleanData(results, true);
 }
 
 export async function getTrendingAnime() {
-  const data = await fetchTMDB(`discover/tv?with_keywords=210024&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  return cleanData(data?.results || [], true);
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=popularity.desc&page=1&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=popularity.desc&page=2&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=popularity.desc&page=3&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=popularity.desc&page=4&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return cleanData(results, true);
 }
 
 // Levenshtein distance for typo tolerance
@@ -347,58 +377,80 @@ export async function getTVRecommendations(id: string) {
 }
 
 export async function discoverMovies(sortBy: string = "popularity.desc", page: number = 1) {
-  const [p1, p2] = await Promise.all([
-    fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
-    fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
-  const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true, false, true) };
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, false, true), page, total_pages: p1?.total_pages ? Math.ceil(p1.total_pages / 4) : 0, total_results: p1?.total_results || 0 };
 }
 
 export async function discoverTV(sortBy: string = "popularity.desc", page: number = 1) {
-  const [p1, p2] = await Promise.all([
-    fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
-    fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
-  const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true, false, true) };
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, false, true), page, total_pages: p1?.total_pages ? Math.ceil(p1.total_pages / 4) : 0, total_results: p1?.total_results || 0 };
 }
 
 export async function discoverAnime(sortBy: string = "popularity.desc", page: number = 1) {
-  const [p1, p2] = await Promise.all([
-    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
-    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_keywords=210024&sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
-  const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true, false, true) };
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, false, true), page, total_pages: p1?.total_pages ? Math.ceil(p1.total_pages / 4) : 0, total_results: p1?.total_results || 0 };
 }
 
 export async function discoverBollywood(sortBy: string = "popularity.desc", page: number = 1) {
-  const [p1, p2] = await Promise.all([
-    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
-    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
-  const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true, false, true) };
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, false, true), page, total_pages: p1?.total_pages ? Math.ceil(p1.total_pages / 4) : 0, total_results: p1?.total_results || 0 };
 }
 
 export async function discoverHollywood(sortBy: string = "popularity.desc", page: number = 1) {
-  const [p1, p2] = await Promise.all([
-    fetchTMDB(`discover/movie?with_original_language=en&sort_by=${sortBy}&page=${page * 2 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
-    fetchTMDB(`discover/movie?with_original_language=en&sort_by=${sortBy}&page=${page * 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/movie?with_original_language=en&sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=en&sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=en&sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=en&sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
   ]);
-  const results = [...(p1?.results || []), ...(p2?.results || [])];
-  return { results: cleanData(results, true, false, true) };
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, false, true), page, total_pages: p1?.total_pages ? Math.ceil(p1.total_pages / 4) : 0, total_results: p1?.total_results || 0 };
 }
 
 export async function getBollywoodMovies() {
-  const data = await fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=popularity.desc&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  return cleanData(data?.results || [], true);
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=popularity.desc&page=1&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=popularity.desc&page=2&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=popularity.desc&page=3&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/movie?with_original_language=hi|ta|te&sort_by=popularity.desc&page=4&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return cleanData(results, true);
 }
 
 export async function getUpcomingMovies() {
-  const data = await fetchTMDB(`movie/upcoming?include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  return cleanData(data?.results || [], true, true);
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`movie/upcoming?page=1&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`movie/upcoming?page=2&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`movie/upcoming?page=3&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`movie/upcoming?page=4&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return cleanData(results, true, true);
 }
 
 export async function getVideos(type: "movie" | "tv", id: string) {
@@ -478,21 +530,36 @@ export async function getAnimeSeasonsFromEpisodeGroups(tvId: string, seasons: an
 }
 
 export async function discoverByGenre(type: "movie" | "tv", genreId: string, sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/${type}?with_genres=${genreId}&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  if (data?.results) data.results = cleanData(data.results, true, false, true);
-  return data;
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/${type}?with_genres=${genreId}&sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/${type}?with_genres=${genreId}&sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/${type}?with_genres=${genreId}&sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/${type}?with_genres=${genreId}&sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, false, true), page, total_pages: p1?.total_pages ? Math.ceil(p1.total_pages / 4) : 0, total_results: p1?.total_results || 0 };
 }
 
 export async function discoverKDramas(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?with_original_language=ko&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  if (data?.results) data.results = cleanData(data.results, true, false, true);
-  return data;
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/tv?with_original_language=ko&sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_original_language=ko&sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_original_language=ko&sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_original_language=ko&sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, false, true), page, total_pages: p1?.total_pages ? Math.ceil(p1.total_pages / 4) : 0, total_results: p1?.total_results || 0 };
 }
 
 export async function discoverDramas(sortBy: string = "popularity.desc", page: number = 1) {
-  const data = await fetchTMDB(`discover/tv?with_original_language=ko|tr|zh|tl&sort_by=${sortBy}&page=${page}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`);
-  if (data?.results) data.results = cleanData(data.results, true, false, true);
-  return data;
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/tv?with_original_language=ko|tr|zh|tl&sort_by=${sortBy}&page=${page * 4 - 3}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_original_language=ko|tr|zh|tl&sort_by=${sortBy}&page=${page * 4 - 2}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_original_language=ko|tr|zh|tl&sort_by=${sortBy}&page=${page * 4 - 1}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`),
+    fetchTMDB(`discover/tv?with_original_language=ko|tr|zh|tl&sort_by=${sortBy}&page=${page * 4}&include_adult=false&without_keywords=${WITHOUT_ADULT_KEYWORDS}&${CACHE_BUST}`)
+  ]);
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, false, true), page, total_pages: p1?.total_pages ? Math.ceil(p1.total_pages / 4) : 0, total_results: p1?.total_results || 0 };
 }
 
 export async function discoverCartoons(sortBy: string = "popularity.desc", page: number = 1, lang?: string) {
@@ -521,4 +588,23 @@ export async function getAllDramas(sortBy: string = "popularity.desc", page: num
 
   const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
   return { results: cleanData(results, true, allowUnreleased, true) };
+}
+
+export async function discoverByProvider(type: "movie" | "tv", providerId: string, sort_by: string = "popularity.desc", page: number = 1): Promise<TMDBResponse | null> {
+  const baseParams = `include_adult=false&include_video=false&language=en-US&sort_by=${sort_by}&with_watch_providers=${providerId}&watch_region=US${type === "movie" ? `&without_keywords=${WITHOUT_ADULT_KEYWORDS}` : ''}`;
+  
+  const [p1, p2, p3, p4] = await Promise.all([
+    fetchTMDB(`discover/${type}?${baseParams}&page=${page * 4 - 3}&${CACHE_BUST}`),
+    fetchTMDB(`discover/${type}?${baseParams}&page=${page * 4 - 2}&${CACHE_BUST}`),
+    fetchTMDB(`discover/${type}?${baseParams}&page=${page * 4 - 1}&${CACHE_BUST}`),
+    fetchTMDB(`discover/${type}?${baseParams}&page=${page * 4}&${CACHE_BUST}`)
+  ]);
+  
+  const results = [...(p1?.results || []), ...(p2?.results || []), ...(p3?.results || []), ...(p4?.results || [])];
+  return { results: cleanData(results, true, true, true), page, total_pages: p1?.total_pages ? Math.ceil(p1.total_pages / 4) : 0, total_results: p1?.total_results || 0 };
+}
+
+export async function getProviders() {
+  const data = await fetchTMDB("watch/providers/movie?watch_region=US");
+  return data?.results || [];
 }

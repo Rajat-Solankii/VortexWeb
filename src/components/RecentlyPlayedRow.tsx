@@ -35,7 +35,7 @@ export default function RecentlyPlayedRow() {
   if (!isClient || history.length === 0) return null;
 
   return (
-    <div className="bg-gradient-to-r from-vortex-purple/10 to-transparent">
+    <>
       <MediaRow 
         title="Continue Watching" 
         items={history} 
@@ -68,6 +68,6 @@ export default function RecentlyPlayedRow() {
           </div>
         }
       />
-    </div>
+    </>
   );
 }

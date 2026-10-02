@@ -2,17 +2,20 @@
 import { TMDBItem } from "@/lib/tmdb";
 import MediaCard from "./MediaCard";
 import { useRef, useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function MediaRow({ 
   title, 
   items, 
   action,
-  onRemove
+  onRemove,
+  viewAllLink
 }: { 
   title: string; 
   items: TMDBItem[]; 
   action?: React.ReactNode;
   onRemove?: (id: number) => void;
+  viewAllLink?: string;
 }) {
   const rowRef = useRef<HTMLDivElement>(null);
   const [isMoved, setIsMoved] = useState(false);
@@ -42,42 +45,52 @@ export default function MediaRow({
             <span className="w-1.5 h-6 bg-vortex-blue rounded-full drop-shadow-[0_0_5px_rgba(0,176,255,0.8)]"></span>
             <span>{title}</span>
         </h2>
-        {action}
+        
+        <div className="flex items-center space-x-4">
+          {action}
+          {viewAllLink && (
+            <Link href={viewAllLink} className="text-sm md:text-base font-medium text-vortex-purple hover:text-white transition-colors">
+              View All
+            </Link>
+          )}
+          <div className="hidden md:flex items-center space-x-2">
+            <button 
+              onClick={() => scroll("left")}
+              className={`w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-all border border-white/5 ${isMoved ? 'opacity-100' : 'opacity-50 cursor-not-allowed'}`}
+              disabled={!isMoved}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+            <button 
+              onClick={() => scroll("right")}
+              className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-all border border-white/5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
       
       <div className="relative">
-        {/* Left Arrow */}
-        <button 
-          onClick={() => scroll("left")}
-          className={`absolute left-0 top-0 bottom-4 w-12 sm:w-16 z-40 bg-black/50 hover:bg-black/80 items-center justify-center text-white transition-all opacity-0 group-hover/row:opacity-100 hidden ${isMoved ? 'md:flex' : ''}`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-          </svg>
-        </button>
-
         {/* Scroll Container (Strict Wrapper) */}
         <div 
           ref={rowRef}
           onScroll={handleScroll}
-          className="flex overflow-x-auto gap-4 md:gap-6 pb-4 px-4 sm:px-6 lg:px-10 xl:px-16 scrollbar-hide snap-x relative z-10"
+          className="flex overflow-x-auto gap-4 md:gap-6 pb-4 scrollbar-hide snap-x relative z-10"
         >
-          {items.map((item) => (
-            <div key={item.id} className="snap-start">
+          {items.map((item, index) => (
+            <div 
+              key={item.id} 
+              className={`snap-start shrink-0 ${index === 0 ? "pl-4 sm:pl-6 lg:pl-10 xl:pl-16" : ""} ${index === items.length - 1 ? "pr-4 sm:pr-6 lg:pr-10 xl:pr-16" : ""}`}
+            >
                <MediaCard item={item} onRemove={onRemove} />
             </div>
           ))}
         </div>
-
-        {/* Right Arrow */}
-        <button 
-          onClick={() => scroll("right")}
-          className="absolute right-0 top-0 bottom-4 w-12 sm:w-16 z-40 bg-black/50 hover:bg-black/80 items-center justify-center text-white transition-all opacity-0 group-hover/row:opacity-100 hidden md:flex"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-          </svg>
-        </button>
       </div>
     </div>
   );

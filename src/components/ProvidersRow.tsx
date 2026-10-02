@@ -115,7 +115,7 @@ export default function ProvidersRow({ providers: dynamicProviders }: { provider
               key={`${provider.id}-${index}`} 
               className={`snap-start shrink-0 group ${index === 0 ? "pl-4 sm:pl-6 lg:pl-10 xl:pl-16" : ""} ${index === displayProviders.length - 1 ? "pr-4 sm:pr-6 lg:pr-10 xl:pr-16" : ""}`}
             >
-               <Link href={`/provider/${provider.id}?name=${provider.name}&type=movie`} className={`relative block w-[120px] md:w-[150px] aspect-square rounded-2xl md:rounded-3xl bg-gradient-to-br ${provider.color} border border-white/10 ${provider.hoverColor} p-4 md:p-6 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] overflow-hidden`}>
+               <Link href={`/provider/${provider.id}?name=${provider.name}&type=movie`} className={`relative block w-[80px] sm:w-[100px] md:w-[130px] aspect-square rounded-[1.25rem] md:rounded-3xl bg-gradient-to-br ${provider.color} border border-white/10 ${provider.hoverColor} p-2.5 sm:p-4 md:p-5 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] overflow-hidden`}>
                   {/* Subtle overlay gloss */}
                   <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   

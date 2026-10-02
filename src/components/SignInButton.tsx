@@ -179,7 +179,7 @@ export default function SignInButton() {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 bg-vortex-purple text-white rounded-lg text-sm font-bold hover:bg-vortex-purple/80 hover:shadow-[0_0_15px_rgba(124,77,255,0.4)] transition-all"
+        className="flex items-center gap-1.5 px-3 py-2 xl:px-4 xl:py-2 bg-vortex-purple text-white rounded-full text-sm font-bold hover:bg-vortex-purple/80 hover:shadow-[0_0_15px_rgba(124,77,255,0.4)] transition-all"
       >
         <LogIn className="h-4 w-4" />
         <span className="hidden sm:inline">Sign In</span>

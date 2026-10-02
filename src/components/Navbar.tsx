@@ -5,6 +5,7 @@ import { Search, Menu, X, LayoutGrid } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import DownloadAppButton from "./DownloadAppButton";
+import SignInButton from "./SignInButton";
 import SearchSuggestions from "./SearchSuggestions";
 import { searchMulti, TMDBItem } from "@/lib/tmdb";
 
@@ -148,6 +149,7 @@ export default function Navbar() {
                 <span className="hidden 2xl:inline">Genres</span>
             </Link>
 
+            <SignInButton />
             <DownloadAppButton />
           </div>
 
@@ -160,7 +162,8 @@ export default function Navbar() {
                <Search className={`absolute h-6 w-6 transition-all duration-300 ${isSearchOpen ? 'rotate-90 opacity-0 scale-50' : 'rotate-0 opacity-100 scale-100'}`} />
                <X className={`absolute h-6 w-6 transition-all duration-300 ${isSearchOpen ? 'rotate-0 opacity-100 scale-100' : '-rotate-90 opacity-0 scale-50'}`} />
              </button>
-             <div className="scale-75 -mx-2"><DownloadAppButton /></div>
+             <div className="scale-75 -mx-2"><SignInButton /></div>
+             <div className="scale-75 -mx-4"><DownloadAppButton /></div>
              <button
                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                className="p-2 text-gray-400 hover:text-white relative w-10 h-10 flex items-center justify-center"

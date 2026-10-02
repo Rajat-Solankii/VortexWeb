@@ -5,6 +5,7 @@ import BackButton from "@/components/BackButton";
 import VideoPlayer from "@/components/VideoPlayer";
 import TrailerPlayer from "@/components/TrailerPlayer";
 import MediaRow from "@/components/MediaRow";
+import UserActions from "@/components/UserActions";
 import { getMovieDetails, getMovieRecommendations, getCredits, getVideos } from "@/lib/tmdb";
 import type { Metadata } from "next";
 
@@ -81,7 +82,13 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
                       <span key={g.id} className="px-3 py-1 bg-white/10 text-gray-300 rounded-full text-xs">{g.name}</span>
                    ))}
                 </div>
-                <p className="text-gray-300 text-sm md:text-base leading-relaxed drop-shadow-sm">{movie.overview}</p>
+                <UserActions 
+                  mediaId={movie.id} 
+                  mediaType="movie" 
+                  title={movie.title} 
+                  posterPath={movie.poster_path} 
+                />
+                <p className="text-gray-300 text-sm md:text-base leading-relaxed drop-shadow-sm mt-6">{movie.overview}</p>
              </div>
              
              <div className="w-full flex-1 min-w-0 flex flex-col justify-start max-w-6xl">

@@ -4,6 +4,7 @@ import MediaRow from "@/components/MediaRow";
 import CastSection from "@/components/CastSection";
 import BackButton from "@/components/BackButton";
 import TrailerPlayer from "@/components/TrailerPlayer";
+import UserActions from "@/components/UserActions";
 import { getTVDetails, getTVRecommendations, getCredits, getVideos, isAnime, getAnimeSeasonsFromEpisodeGroups } from "@/lib/tmdb";
 import type { Metadata } from "next";
 
@@ -94,7 +95,13 @@ export default async function TVDetailsPage({ params }: { params: Promise<{ id: 
                         <span key={g.id} className="px-3 py-1 bg-white/10 text-gray-300 rounded-full text-xs">{g.name}</span>
                      ))}
                   </div>
-                  <p className="text-gray-300 text-sm md:text-base leading-relaxed drop-shadow-sm">{tv.overview}</p>
+                  <UserActions 
+                    mediaId={tv.id} 
+                    mediaType="tv" 
+                    title={tv.name} 
+                    posterPath={tv.poster_path} 
+                  />
+                  <p className="text-gray-300 text-sm md:text-base leading-relaxed drop-shadow-sm mt-6">{tv.overview}</p>
                </div>
 
                <div className="w-full flex-1 min-w-0 max-w-6xl">

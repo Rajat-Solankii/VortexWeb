@@ -7,7 +7,15 @@ export default function MediaCard({ item, onRemove }: { item: TMDBItem, onRemove
   // For discovery endpoints we'll just have to pass a prop, but here we assume 'name' means TV.
   const isTV = item.media_type === "tv" || (!item.media_type && item.name && !item.title);
   const title = item.title || item.name;
-  const link = isTV ? `/tv/${item.id}` : `/movie/${item.id}`;
+  
+  // Check if this is a HistoryItem with season/episode progress
+  const season = (item as any).season;
+  const episode = (item as any).episode;
+  const hasProgress = season !== undefined && episode !== undefined;
+  
+  const link = isTV 
+    ? (hasProgress ? `/tv/${item.id}?s=${season}&e=${episode}` : `/tv/${item.id}`) 
+    : `/movie/${item.id}`;
   
   const now = new Date().toISOString().split('T')[0];
   const releaseDate = item.release_date || item.first_air_date;
@@ -30,11 +38,16 @@ export default function MediaCard({ item, onRemove }: { item: TMDBItem, onRemove
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-              <span className="text-white text-xs font-semibold drop-shadow-md">{isComingSoon ? 'Coming Soon' : 'Watch Now'}</span>
+              <span className="text-white text-xs font-semibold drop-shadow-md">{isComingSoon ? 'Coming Soon' : (hasProgress ? `Resume S${season} E${episode}` : 'Watch Now')}</span>
           </div>
           {isComingSoon && (
             <div className="absolute top-2 left-2 bg-vortex-purple text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-lg backdrop-blur-sm z-10 border border-white/20">
               COMING SOON
+            </div>
+          )}
+          {hasProgress && !isComingSoon && (
+            <div className="absolute top-2 left-2 bg-vortex-blue text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-lg backdrop-blur-sm z-10 border border-white/20 drop-shadow-[0_0_5px_rgba(0,176,255,0.8)]">
+              S{season} E{episode}
             </div>
           )}
         </div>

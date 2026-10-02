@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     return { title: 'TV Show Not Found | Vortex' };
   }
 
-  const title = `${tv.name} | Vortex`;
-  const description = tv.overview;
+  const title = `Watch ${tv.name} (${tv.first_air_date ? tv.first_air_date.split('-')[0] : ''}) Online Free | Vortex`;
+  const description = `Watch ${tv.name} for free in HD quality. All seasons and episodes available online. ${tv.overview}`;
   const imageUrl = tv.backdrop_path
     ? `https://image.tmdb.org/t/p/w1280${tv.backdrop_path}`
     : tv.poster_path

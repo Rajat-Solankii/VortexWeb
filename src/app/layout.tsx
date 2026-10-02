@@ -14,8 +14,40 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vortex | Premium Streaming",
-  description: "Watch the latest movies, TV shows, and anime on Vortex.",
+  title: {
+    default: "Vortex | Watch Free Movies, TV Shows & Anime Online",
+    template: "%s | Vortex Free Streaming",
+  },
+  description: "Watch the latest movies, TV shows, K-dramas, and anime online for free in HD quality. Vortex is your ultimate free streaming platform with no registration required.",
+  keywords: ["free streaming platform", "watch movies online free", "free movies", "free tv shows", "watch anime free", "watch kdrama free", "hd movies", "streaming site without ads", "Vortex streaming", "watchvortex"],
+  authors: [{ name: "Vortex" }],
+  creator: "Vortex",
+  publisher: "Vortex",
+  metadataBase: new URL('https://www.watchvortex.me'),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://www.watchvortex.me",
+    siteName: "Vortex Streaming",
+    title: "Vortex | Watch Free Movies, TV Shows & Anime Online",
+    description: "Watch the latest movies, TV shows, K-dramas, and anime online for free in HD quality on Vortex.",
+    images: [
+      {
+        url: "/og-image.jpg", // We can add an OG image later
+        width: 1200,
+        height: 630,
+        alt: "Vortex Free Streaming",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vortex | Watch Free Movies, TV Shows & Anime Online",
+    description: "Watch the latest movies, TV shows, K-dramas, and anime online for free in HD quality on Vortex.",
+  },
+  alternates: {
+    canonical: "https://www.watchvortex.me",
+  },
 };
 
 import Navbar from "@/components/Navbar";

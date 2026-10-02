@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     return { title: 'Movie Not Found | Vortex' };
   }
 
-  const title = `${movie.title} | Vortex`;
-  const description = movie.overview;
+  const title = `Watch ${movie.title} (${movie.release_date ? movie.release_date.split('-')[0] : ''}) Online Free | Vortex`;
+  const description = `Watch ${movie.title} for free in HD quality. ${movie.overview}`;
   const imageUrl = movie.backdrop_path
     ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`
     : movie.poster_path

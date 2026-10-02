@@ -3,24 +3,10 @@ import { Info, Cloud, Server, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export default function VideoPlayer({ type, id, season, episode, title, posterPath, tmdbSeason, tmdbEpisode, anilistId, absoluteEpisode }: { type: "movie" | "tv", id: string, season?: number, episode?: number, title?: string, posterPath?: string, tmdbSeason?: number, tmdbEpisode?: number, anilistId?: number | null, absoluteEpisode?: number }) {
-  const [activeServer, setActiveServer] = useState<"ythd" | "nxsha" | "cinehd" | "rozgarlelo" | "vixsrc" | "vidcore" | "vidrock" | "primesrc">("ythd");
+  const [activeServer, setActiveServer] = useState<"ythd" | "nxsha" | "rozgarlelo" | "vixsrc" | "vidcore" | "vidrock" | "primesrc">("ythd");
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [imdbId, setImdbId] = useState<string | null>(null);
   let url = "";
   let downloadUrl = "";
-
-  useEffect(() => {
-    if (activeServer === "cinehd" && !imdbId) {
-      fetch(`https://vortex-proxy-six.vercel.app/api/tmdb?path=${type}/${id}/external_ids`)
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.imdb_id) {
-            setImdbId(data.imdb_id);
-          }
-        })
-        .catch(err => console.error(err));
-    }
-  }, [activeServer, id, type, imdbId]);
 
   // Use TMDB-specific season/episode if provided (vital for flattened anime), otherwise fallback to UI season/episode
   const s = tmdbSeason ?? season ?? 1;
@@ -81,13 +67,6 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
     } else {
       url = `https://nxsha.space/embed/tv/${id}/${s}/${e}`;
     }
-  } else if (activeServer === "cinehd") {
-    const finalId = imdbId || id;
-    if (type === "movie") {
-      url = `https://cinehd.vc/api/hdmovies/embed?type=movie&id=${finalId}`;
-    } else {
-      url = `https://cinehd.vc/api/hdmovies/embed?type=tv&id=${finalId}&s=${s}&e=${e}`;
-    }
   } else if (activeServer === "rozgarlelo") {
     if (type === "movie") {
       url = `https://rozgarlelo.modiplay.xyz/embed/tmdb/movie?id=${id}`;
@@ -138,12 +117,11 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
             >
               <option value="ythd">Server 1 (YTHD)</option>
               <option value="nxsha">Server 2 (Nxsha - Multi)</option>
-              <option value="cinehd">Server 3 (CineHD - Multi)</option>
-              <option value="rozgarlelo">Server 4 (Rozgarlelo - Multi)</option>
-              <option value="vixsrc">Server 5 (Vixsrc)</option>
-              <option value="vidcore">Server 6 (Vidcore)</option>
-              <option value="vidrock">Server 7 (Vidrock)</option>
-              <option value="primesrc">Server 8 (Primesrc)</option>
+              <option value="rozgarlelo">Server 3 (Rozgarlelo - Multi)</option>
+              <option value="vixsrc">Server 4 (Vixsrc)</option>
+              <option value="vidcore">Server 5 (Vidcore)</option>
+              <option value="vidrock">Server 6 (Vidrock)</option>
+              <option value="primesrc">Server 7 (Primesrc)</option>
             </select>
           </div>
           <p className="text-xs text-gray-500 italic max-w-sm">

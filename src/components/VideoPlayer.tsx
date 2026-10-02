@@ -3,10 +3,24 @@ import { Info, Cloud, Server, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export default function VideoPlayer({ type, id, season, episode, title, posterPath, tmdbSeason, tmdbEpisode, anilistId, absoluteEpisode }: { type: "movie" | "tv", id: string, season?: number, episode?: number, title?: string, posterPath?: string, tmdbSeason?: number, tmdbEpisode?: number, anilistId?: number | null, absoluteEpisode?: number }) {
-  const [activeServer, setActiveServer] = useState<"ythd" | "vaplayer" | "videasy" | "nhdapi">("ythd");
+  const [activeServer, setActiveServer] = useState<"ythd" | "nxsha" | "cinehd" | "rozgarlelo" | "vixsrc" | "vidcore" | "vidrock" | "primesrc">("ythd");
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [imdbId, setImdbId] = useState<string | null>(null);
   let url = "";
   let downloadUrl = "";
+
+  useEffect(() => {
+    if (activeServer === "cinehd" && !imdbId) {
+      fetch(`https://vortex-proxy-six.vercel.app/api/tmdb?path=${type}/${id}/external_ids`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.imdb_id) {
+            setImdbId(data.imdb_id);
+          }
+        })
+        .catch(err => console.error(err));
+    }
+  }, [activeServer, id, type, imdbId]);
 
   // Use TMDB-specific season/episode if provided (vital for flattened anime), otherwise fallback to UI season/episode
   const s = tmdbSeason ?? season ?? 1;
@@ -61,25 +75,48 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
     } else {
       url = `https://ythd.org/embed/${id}/${s}-${e}`;
     }
-  } else if (activeServer === "vaplayer") {
-    const vaplayerParams = 'primaryColor=%237C4DFF'; // Vortex purple
+  } else if (activeServer === "nxsha") {
     if (type === "movie") {
-      url = `https://vaplayer.ru/embed/movie/${id}?${vaplayerParams}`;
+      url = `https://nxsha.space/embed/movie/${id}`;
     } else {
-      url = `https://vaplayer.ru/embed/tv/${id}/${s}/${e}?${vaplayerParams}`;
+      url = `https://nxsha.space/embed/tv/${id}/${s}/${e}`;
     }
-  } else if (activeServer === "videasy") {
-    const videasyParams = 'nextEpisode=true&autoplayNextEpisode=true&episodeSelector=true&overlay=true&color=8B5CF6';
+  } else if (activeServer === "cinehd") {
+    const finalId = imdbId || id;
     if (type === "movie") {
-      url = `https://player.videasy.net/movie/${id}?${videasyParams}`;
+      url = `https://cinehd.vc/api/hdmovies/embed?type=movie&id=${finalId}`;
     } else {
-      url = `https://player.videasy.net/tv/${id}/${s}/${e}?${videasyParams}`;
+      url = `https://cinehd.vc/api/hdmovies/embed?type=tv&id=${finalId}&s=${s}&e=${e}`;
     }
-  } else if (activeServer === "nhdapi") {
+  } else if (activeServer === "rozgarlelo") {
     if (type === "movie") {
-      url = `https://nhdapi.com/movie/${id}`;
+      url = `https://rozgarlelo.modiplay.xyz/embed/tmdb/movie?id=${id}`;
     } else {
-      url = `https://nhdapi.com/tv/${id}/${s}/${e}`;
+      url = `https://rozgarlelo.modiplay.xyz/embed/tmdb/tv?id=${id}&s=${s}&e=${e}`;
+    }
+  } else if (activeServer === "vixsrc") {
+    if (type === "movie") {
+      url = `https://vixsrc.to/embed/movie/${id}`;
+    } else {
+      url = `https://vixsrc.to/embed/tv/${id}/${s}/${e}`;
+    }
+  } else if (activeServer === "vidcore") {
+    if (type === "movie") {
+      url = `https://vidcore.io/embed/movie/${id}`;
+    } else {
+      url = `https://vidcore.io/embed/tv/${id}/${s}/${e}`;
+    }
+  } else if (activeServer === "vidrock") {
+    if (type === "movie") {
+      url = `https://vidrock.net/embed/movie/${id}`;
+    } else {
+      url = `https://vidrock.net/embed/tv/${id}/${s}/${e}`;
+    }
+  } else if (activeServer === "primesrc") {
+    if (type === "movie") {
+      url = `https://primesrc.me/embed/movie/${id}`;
+    } else {
+      url = `https://primesrc.me/embed/tv/${id}/${s}/${e}`;
     }
   }
 
@@ -99,10 +136,14 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
               onChange={(e) => setActiveServer(e.target.value as any)}
               className="bg-black border border-white/10 text-gray-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-vortex-purple focus:ring-1 focus:ring-vortex-purple transition-all"
             >
-              <option value="ythd">Server 1 (Default)</option>
-              <option value="vaplayer">Server 2</option>
-              <option value="videasy">Server 3</option>
-              <option value="nhdapi">Server 4</option>
+              <option value="ythd">Server 1 (YTHD)</option>
+              <option value="nxsha">Server 2 (Nxsha - Multi)</option>
+              <option value="cinehd">Server 3 (CineHD - Multi)</option>
+              <option value="rozgarlelo">Server 4 (Rozgarlelo - Multi)</option>
+              <option value="vixsrc">Server 5 (Vixsrc)</option>
+              <option value="vidcore">Server 6 (Vidcore)</option>
+              <option value="vidrock">Server 7 (Vidrock)</option>
+              <option value="primesrc">Server 8 (Primesrc)</option>
             </select>
           </div>
           <p className="text-xs text-gray-500 italic max-w-sm">

@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
           {
             // Allow iframes from our specific streaming servers
             key: "Content-Security-Policy",
-            value: "frame-src 'self' https://nhdapi.com https://player.videasy.net https://vidvault.to https://vaplayer.ru https://cloudorchestranova.com https://ythd.org; connect-src *;"
+            value: "frame-src 'self' https://nhdapi.com https://player.videasy.net https://vidvault.to https://vaplayer.ru https://cloudorchestranova.com https://ythd.org https://nxsha.space https://cinehd.vc https://rozgarlelo.modiplay.xyz https://vixsrc.to https://vidcore.io https://vidrock.net https://primesrc.me; connect-src *;"
           },
           {
             // Block popups & top-level navigation from embedded iframes.

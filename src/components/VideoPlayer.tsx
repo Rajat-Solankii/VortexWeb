@@ -3,7 +3,7 @@ import { Info, Cloud, Server, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export default function VideoPlayer({ type, id, season, episode, title, posterPath, tmdbSeason, tmdbEpisode, anilistId, absoluteEpisode }: { type: "movie" | "tv", id: string, season?: number, episode?: number, title?: string, posterPath?: string, tmdbSeason?: number, tmdbEpisode?: number, anilistId?: number | null, absoluteEpisode?: number }) {
-  const [activeServer, setActiveServer] = useState<"vaplayer" | "videasy" | "nhdapi">("vaplayer");
+  const [activeServer, setActiveServer] = useState<"ythd" | "vaplayer" | "videasy" | "nhdapi">("ythd");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   let url = "";
   let downloadUrl = "";
@@ -55,7 +55,13 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
     };
   }, [title, type, s, e, posterPath]);
 
-  if (activeServer === "vaplayer") {
+  if (activeServer === "ythd") {
+    if (type === "movie") {
+      url = `https://ythd.org/embed/${id}`;
+    } else {
+      url = `https://ythd.org/embed/${id}/${s}-${e}`;
+    }
+  } else if (activeServer === "vaplayer") {
     const vaplayerParams = 'primaryColor=%237C4DFF'; // Vortex purple
     if (type === "movie") {
       url = `https://vaplayer.ru/embed/movie/${id}?${vaplayerParams}`;
@@ -93,9 +99,10 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
               onChange={(e) => setActiveServer(e.target.value as any)}
               className="bg-black border border-white/10 text-gray-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-vortex-purple focus:ring-1 focus:ring-vortex-purple transition-all"
             >
-              <option value="vaplayer">Server 1 (Default)</option>
-              <option value="videasy">Server 2</option>
-              <option value="nhdapi">Server 3</option>
+              <option value="ythd">Server 1 (Default)</option>
+              <option value="vaplayer">Server 2</option>
+              <option value="videasy">Server 3</option>
+              <option value="nhdapi">Server 4</option>
             </select>
           </div>
           <p className="text-xs text-gray-500 italic max-w-sm">
@@ -123,6 +130,7 @@ export default function VideoPlayer({ type, id, season, episode, title, posterPa
         onMouseEnter={() => iframeRef.current?.focus()}
       >
         <iframe
+          key={activeServer}
           ref={iframeRef}
           src={url}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

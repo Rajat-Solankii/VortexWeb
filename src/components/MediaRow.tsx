@@ -87,7 +87,9 @@ export default function MediaRow({
               key={item.id} 
               className={`snap-start shrink-0 ${index === 0 ? "pl-4 sm:pl-6 lg:pl-10 xl:pl-16" : ""} ${index === items.length - 1 ? "pr-4 sm:pr-6 lg:pr-10 xl:pr-16" : ""}`}
             >
-               <MediaCard item={item} onRemove={onRemove} />
+               <div className="w-[140px] md:w-[180px]">
+                 <MediaCard item={item} onRemove={onRemove} />
+               </div>
             </div>
           ))}
         </div>

@@ -22,7 +22,7 @@ export default function MediaCard({ item, onRemove }: { item: TMDBItem, onRemove
   const isComingSoon = releaseDate && releaseDate > now;
 
   return (
-    <div className="relative group w-[140px] md:w-[180px] flex-shrink-0">
+    <div className="relative group w-full h-full flex-shrink-0">
       <Link href={link} className="block">
         <div className="relative aspect-[2/3] rounded-xl overflow-hidden border border-white/5 group-hover:border-vortex-purple/50 group-hover:shadow-[0_0_20px_rgba(124,77,255,0.6)] transition-all bg-white/5">
           {item.poster_path ? (

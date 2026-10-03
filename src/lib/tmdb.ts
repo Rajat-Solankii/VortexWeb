@@ -1,4 +1,8 @@
 const getBaseUrl = () => {
+  if (typeof window === "undefined") {
+    // When Next.js builds on the server, bypass DNS and hit the proxy directly
+    return "http://127.0.0.1:8080";
+  }
   return "https://api.watchvortex.me";
 };
 const BASE_URL = getBaseUrl();

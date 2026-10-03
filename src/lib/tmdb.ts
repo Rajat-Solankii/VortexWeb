@@ -42,7 +42,7 @@ export async function fetchTMDB(path: string, params: Record<string, string> = {
   for (let i = 0; i < 3; i++) {
     try {
       const res = await fetch(url, { 
-        next: { revalidate: 0 },
+        next: { revalidate: 1209600 },
         signal: AbortSignal.timeout(8000) // 8 second timeout to prevent hanging
       });
       

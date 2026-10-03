@@ -3,7 +3,7 @@ import HomeClientView from "@/components/HomeClientView";
 import AndroidAppBanner from "@/components/AndroidAppBanner";
 import { getTrending, getPopularMovies, getTopRatedTVShows, getTrendingAnime, getKDramas, getTurkishDramas, getChineseDramas, getPhilippineDramas, getBollywoodMovies, getUpcomingMovies, getProviders } from "@/lib/tmdb";
 
-export const revalidate = 3600;
+export const revalidate = 1209600;
 
 export default async function Home() {
   const [trending, popularMovies, topRatedTV, anime, kDramas, turkishDramas, chineseDramas, philippineDramas, bollywood, upcoming, providers] = await Promise.all([

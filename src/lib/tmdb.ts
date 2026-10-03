@@ -1,7 +1,5 @@
 const getBaseUrl = () => {
-  if (typeof window !== "undefined") return "/api/tmdb"; // Client side
-  if (process.env.NEXT_PUBLIC_SITE_URL) return `${process.env.NEXT_PUBLIC_SITE_URL}/api/tmdb`; // AWS Amplify custom env
-  return "http://localhost:3000/api/tmdb"; // Local development
+  return "https://api.watchvortex.me";
 };
 const BASE_URL = getBaseUrl();
 const WITHOUT_ADULT_KEYWORDS = "12113,190370,181827,12053,155455,155456,155457,234333";

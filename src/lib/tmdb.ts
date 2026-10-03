@@ -71,7 +71,8 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
     "hentai", "ecchi", "erotica", "sexual content", "nudity",
     "uncensored", "sexual", "sex", "adult animation", "porn",
     "joshiochi", "sweet punishment", "overflow", "redo of healer",
-    "isekai meikyū", "harem in the labyrinth", "world's end harem"
+    "isekai meikyū", "harem in the labyrinth", "world's end harem",
+    "lust", "brothel", "succubus", "harem", "prostitute", "slave"
   ];
 
   const ADULT_TITLES = [
@@ -80,7 +81,9 @@ export function cleanData(items: TMDBItem[], strict: boolean = true, allowUnrele
     "my wife is the student council president", "kiss x sis",
     "monster musume", "to love ru", "testament of sister new devil",
     "labyrinth of another world", "harem in the labyrinth",
-    "world's end harem", "valkyrie drive", "freezing", "seikon no qwaser"
+    "world's end harem", "valkyrie drive", "freezing", "seikon no qwaser",
+    "interspecies reviewers", "peter grill", "mushoku tensei", "domestic girlfriend",
+    "souryo to majiwaru", "shikiyoku", "harem camp"
   ];
 
   const FORBIDDEN_KEYWORDS = [

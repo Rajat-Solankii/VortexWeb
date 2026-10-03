@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { User } from "@supabase/supabase-js";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function SignInButton() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,6 +15,8 @@ export default function SignInButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
   
   // Form State
   const [email, setEmail] = useState("");
@@ -41,6 +44,9 @@ export default function SignInButton() {
         setUser(session?.user ?? null);
         if (session?.user) {
           setIsModalOpen(false); // Close modal on successful login
+          if (window.location.pathname === "/") {
+            router.push("/home");
+          }
         }
       }
     );
@@ -63,10 +69,11 @@ export default function SignInButton() {
   }, []);
 
   const handleGoogleSignIn = async () => {
+    const nextPath = pathname === "/" ? "/home" : pathname;
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: `${location.origin}/auth/callback?next=${nextPath}`,
       },
     });
   };
@@ -101,6 +108,7 @@ export default function SignInButton() {
 
     try {
       if (isSignUp) {
+        const nextPath = pathname === "/" ? "/home" : pathname;
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -108,7 +116,7 @@ export default function SignInButton() {
             data: {
               full_name: username
             },
-            emailRedirectTo: `${location.origin}/auth/callback`,
+            emailRedirectTo: `${location.origin}/auth/callback?next=${nextPath}`,
           },
         });
         if (error) throw error;

@@ -3,8 +3,24 @@
 import Link from "next/link";
 import { Zap, Globe, Smartphone, Play } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function LandingPage() {
+  const router = useRouter();
+  
+  useEffect(() => {
+    const checkUser = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        router.push("/home");
+      }
+    };
+    checkUser();
+  }, [router]);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#07090e] text-[#f8fafc] font-sans -mt-16">
       {/* Glow Background */}

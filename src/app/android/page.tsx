@@ -5,6 +5,25 @@ import { CheckCircle2, MonitorPlay, Smartphone, History, Zap } from "lucide-reac
 export const metadata: Metadata = {
   title: "Vortex for Android | Download the App",
   description: "Download the official Vortex app for Android. Experience seamless, ad-free streaming with our custom Media3 player.",
+  openGraph: {
+    title: "Vortex for Android | Download the App",
+    description: "Download the official Vortex app for Android. Experience seamless, ad-free streaming with our custom Media3 player.",
+    url: "https://www.watchvortex.me/android",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Vortex for Android",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vortex for Android | Download the App",
+    description: "Download the official Vortex app for Android. Experience seamless, ad-free streaming with our custom Media3 player.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function AndroidPage() {

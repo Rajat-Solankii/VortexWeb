@@ -44,6 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Vortex | Watch Free Movies, TV Shows & Anime Online",
     description: "Watch the latest movies, TV shows, K-dramas, and anime online for free in HD quality on Vortex.",
+    images: ["/og-image.jpg"],
   },
   alternates: {
     canonical: "https://www.watchvortex.me",

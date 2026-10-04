@@ -54,12 +54,72 @@ export const metadata: Metadata = {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AuthProvider from "@/components/AuthProvider";
+import { db } from "@/lib/db";
+import MaintenanceScreen from "@/components/MaintenanceScreen";
+import MaintenanceWatcher from "@/components/MaintenanceWatcher";
+import BannedScreen from "@/components/BannedScreen";
+import { headers } from "next/headers";
 
-export default function RootLayout({
+export const dynamic = "force-dynamic";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let isMaintenance = false;
+  let isBanned = false;
+  let clientIp = "Unknown";
+  
+  try {
+    // 1. Check Maintenance Mode
+    const stmt = db.prepare("SELECT value FROM settings WHERE key = 'maintenance_mode'");
+    const setting = stmt.get() as any;
+    if (setting && setting.value === 'true') {
+      isMaintenance = true;
+    }
+
+    // 2. Check if IP is banned
+    const reqHeaders = await headers();
+    // Vercel/Next.js uses x-forwarded-for for client IP
+    let ip = reqHeaders.get("x-forwarded-for") || reqHeaders.get("x-real-ip");
+    
+    if (ip) {
+      ip = ip.split(',')[0].trim();
+      if (ip === "::1" || ip === "::ffff:127.0.0.1") ip = "127.0.0.1";
+    }
+    
+    // Local development fallback
+    if (!ip && process.env.NODE_ENV === 'development') {
+      ip = "127.0.0.1";
+    } else if (!ip) {
+      ip = "Unknown";
+    }
+    
+    if (ip !== "Unknown") {
+      const banStmt = db.prepare("SELECT ip FROM banned_ips WHERE ip = ?");
+      const banRecord = banStmt.get(ip);
+      if (banRecord) {
+        isBanned = true;
+      }
+    }
+    
+    if (ip) clientIp = ip;
+  } catch (err) {
+    console.error("Failed to fetch layout checks:", err);
+  }
+
+  if (isBanned) {
+    return (
+      <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark h-full`} suppressHydrationWarning>
+        <body className="min-h-full flex items-center justify-center bg-black overflow-hidden font-sans">
+          <MaintenanceWatcher />
+          <BannedScreen ip={clientIp} />
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html
       lang="en"
@@ -75,14 +135,18 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://cedarorbit.top" />
       </head>
       <body className="min-h-full flex flex-col bg-black">
-        <AuthProvider>
-          <Navbar />
-          <main className="flex-grow pt-16">
-            {children}
-          </main>
-
-          <Footer />
-        </AuthProvider>
+        {isMaintenance ? (
+          <MaintenanceScreen />
+        ) : (
+          <AuthProvider>
+            <MaintenanceWatcher />
+            <Navbar />
+            <main className="flex-grow pt-16">
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
+        )}
         <Analytics />
       </body>
     </html>

@@ -16,6 +16,7 @@ export default function CollectionClient({ initialCollection, initialItems }: { 
   const [isSaving, setIsSaving] = useState(false);
   
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleRemoveItem = async (e: React.MouseEvent, mediaId: string, mediaType: string) => {
     e.preventDefault();
@@ -60,8 +61,6 @@ export default function CollectionClient({ initialCollection, initialItems }: { 
   };
 
   const handleDeleteCollection = async () => {
-    if (!confirm("Are you sure you want to delete this collection? This action cannot be undone.")) return;
-    
     setIsDeleting(true);
     try {
       const res = await fetch(`/api/collections/${collection.id}`, {
@@ -74,6 +73,7 @@ export default function CollectionClient({ initialCollection, initialItems }: { 
     } catch (err) {
       console.error(err);
       setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -129,7 +129,7 @@ export default function CollectionClient({ initialCollection, initialItems }: { 
           </div>
 
           <button 
-            onClick={handleDeleteCollection}
+            onClick={() => setShowDeleteModal(true)}
             disabled={isDeleting}
             className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-colors text-sm font-medium"
           >
@@ -185,6 +185,34 @@ export default function CollectionClient({ initialCollection, initialItems }: { 
           </div>
         )}
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#141519] border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <h3 className="text-xl font-bold text-white mb-2">Delete Collection?</h3>
+            <p className="text-gray-400 mb-6">
+              Are you sure you want to delete <span className="text-white font-medium">"{collection.name}"</span>? This action cannot be undone and will remove all {items.length} items from it.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-colors font-medium text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteCollection}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors font-medium text-sm flex items-center gap-2"
+              >
+                {isDeleting ? "Deleting..." : "Yes, Delete It"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

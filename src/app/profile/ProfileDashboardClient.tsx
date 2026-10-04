@@ -1,23 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { LogOut, Bookmark, Play, Settings, Clock, Trash2, FolderPlus, BarChart3, Languages, Tv, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export default function ProfileDashboardClient({ user, bookmarks: initialBookmarks, history: initialHistory, initialCollections = [] }: { user: any, bookmarks: any[], history: any[], initialCollections?: any[] }) {
-  const [activeTab, setActiveTab] = useState("watchlist");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  
+  const tabQuery = searchParams.get("tab") || "watchlist";
+  const [activeTab, setActiveTab] = useState(tabQuery);
+
+  // Sync state when URL changes (e.g. browser back button)
+  useEffect(() => {
+    if (tabQuery !== activeTab) {
+      setActiveTab(tabQuery);
+    }
+  }, [tabQuery]);
+
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tabId);
+    router.push(`${pathname}?${params.toString()}`);
+  };
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [history, setHistory] = useState(initialHistory);
   const [collections, setCollections] = useState(initialCollections);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showClearHistoryModal, setShowClearHistoryModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [filterType, setFilterType] = useState('all');
   const [sortOrder, setSortOrder] = useState('recent');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  // Settings / Change Email State
+  const [changeEmailStep, setChangeEmailStep] = useState<"initial" | "verify">("initial");
+  const [newEmail, setNewEmail] = useState("");
+  const [changeEmailOtp, setChangeEmailOtp] = useState("");
+  const [isChangingEmail, setIsChangingEmail] = useState(false);
+  const [changeEmailError, setChangeEmailError] = useState("");
+  const [changeEmailSuccess, setChangeEmailSuccess] = useState("");
 
   const handleCreateCollection = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,9 +93,9 @@ export default function ProfileDashboardClient({ user, bookmarks: initialBookmar
   };
 
   const handleClearHistory = async () => {
-    if (!confirm("Are you sure you want to clear your entire watch history?")) return;
     setHistory([]);
     localStorage.removeItem("vortex_history");
+    setShowClearHistoryModal(false);
     try {
       await fetch("/api/history", { method: "POST", body: JSON.stringify({ history: [] }) });
     } catch (err) {
@@ -91,7 +120,61 @@ export default function ProfileDashboardClient({ user, bookmarks: initialBookmar
     { id: "watchlist", label: "My Watchlist", icon: Bookmark },
     { id: "history", label: "Watch History", icon: Clock },
     { id: "playlists", label: "Collections", icon: FolderPlus },
+    { id: "settings", label: "Settings", icon: Settings },
   ];
+
+  const handleRequestEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangeEmailError("");
+    setChangeEmailSuccess("");
+    setIsChangingEmail(true);
+
+    try {
+      const res = await fetch("/api/profile/change-email/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      
+      setChangeEmailStep("verify");
+      setChangeEmailSuccess(data.message);
+    } catch (err: any) {
+      setChangeEmailError(err.message);
+    } finally {
+      setIsChangingEmail(false);
+    }
+  };
+
+  const handleVerifyEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangeEmailError("");
+    setChangeEmailSuccess("");
+    setIsChangingEmail(true);
+
+    try {
+      const res = await fetch("/api/profile/change-email/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newEmail, otp: changeEmailOtp }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      
+      setChangeEmailStep("initial");
+      setNewEmail("");
+      setChangeEmailOtp("");
+      setChangeEmailSuccess("Email updated successfully! Please sign in again.");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (err: any) {
+      setChangeEmailError(err.message);
+    } finally {
+      setIsChangingEmail(false);
+    }
+  };
 
   return (
     <>
@@ -111,7 +194,7 @@ export default function ProfileDashboardClient({ user, bookmarks: initialBookmar
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => handleTabChange(tab.id)}
                     className={`relative pb-4 text-sm font-bold uppercase tracking-wider transition-colors ${
                       isActive ? "text-white" : "text-gray-500 hover:text-gray-300"
                     }`}
@@ -275,7 +358,7 @@ export default function ProfileDashboardClient({ user, bookmarks: initialBookmar
                     </div>
                     {history.length > 0 && (
                       <button 
-                        onClick={handleClearHistory}
+                        onClick={() => setShowClearHistoryModal(true)}
                         className="text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2"
                       >
                         <Trash2 className="w-4 h-4" /> Clear All
@@ -390,8 +473,81 @@ export default function ProfileDashboardClient({ user, bookmarks: initialBookmar
                 </motion.section>
               )}
 
+              {activeTab === "settings" && (
+                <motion.section 
+                  key="settings"
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                  className="bg-white/5 rounded-2xl p-6 border border-white/10 min-h-[400px]"
+                >
+                  <div className="flex items-center gap-3 mb-8">
+                    <Settings className="w-6 h-6 text-[#b794f6]" />
+                    <h2 className="text-2xl font-bold text-white">Account Settings</h2>
+                  </div>
+                  
+                  <div className="max-w-md bg-[#141519] border border-white/10 rounded-xl p-6">
+                    <h3 className="text-lg font-bold text-white mb-4">Change Email Address</h3>
+                    <p className="text-sm text-gray-400 mb-6">Current Email: <span className="text-white font-medium">{user.email}</span></p>
+                    
+                    {changeEmailError && <div className="bg-red-500/10 text-red-400 p-3 rounded-lg text-sm mb-4">{changeEmailError}</div>}
+                    {changeEmailSuccess && <div className="bg-green-500/10 text-green-400 p-3 rounded-lg text-sm mb-4">{changeEmailSuccess}</div>}
 
-
+                    {changeEmailStep === "initial" ? (
+                      <form onSubmit={handleRequestEmailChange} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-400 mb-1.5">New Email Address</label>
+                          <input 
+                            type="email" 
+                            required
+                            value={newEmail}
+                            onChange={(e) => setNewEmail(e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#7047eb] transition-all"
+                            placeholder="new.email@example.com"
+                          />
+                        </div>
+                        <button 
+                          type="submit" 
+                          disabled={isChangingEmail || !newEmail.trim()}
+                          className="w-full bg-[#7047eb] hover:bg-[#5d35d9] disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-all"
+                        >
+                          {isChangingEmail ? "Sending Code..." : "Send Verification Code"}
+                        </button>
+                      </form>
+                    ) : (
+                      <form onSubmit={handleVerifyEmailChange} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-400 mb-1.5">Enter 6-Digit Code</label>
+                          <p className="text-xs text-gray-500 mb-3">We sent a code to <span className="text-white">{newEmail}</span></p>
+                          <input 
+                            type="text" 
+                            required
+                            maxLength={6}
+                            value={changeEmailOtp}
+                            onChange={(e) => setChangeEmailOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white tracking-[0.5em] text-center text-xl font-mono focus:outline-none focus:border-[#7047eb] transition-all"
+                            placeholder="000000"
+                          />
+                        </div>
+                        <div className="flex gap-3">
+                          <button 
+                            type="button" 
+                            onClick={() => { setChangeEmailStep("initial"); setChangeEmailError(""); setChangeEmailSuccess(""); }}
+                            className="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-all"
+                          >
+                            Cancel
+                          </button>
+                          <button 
+                            type="submit" 
+                            disabled={isChangingEmail || changeEmailOtp.length !== 6}
+                            className="flex-1 bg-[#7047eb] hover:bg-[#5d35d9] disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-all"
+                          >
+                            {isChangingEmail ? "Verifying..." : "Verify & Save"}
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                </motion.section>
+              )}
 
             </AnimatePresence>
           </div>
@@ -452,6 +608,46 @@ export default function ProfileDashboardClient({ user, bookmarks: initialBookmar
                   {isCreating ? "Creating..." : "Create Collection"}
                 </button>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Clear History Confirmation Modal */}
+      <AnimatePresence>
+        {showClearHistoryModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setShowClearHistoryModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative bg-[#141519] border border-white/10 p-6 rounded-2xl w-full max-w-md shadow-2xl"
+            >
+              <h3 className="text-xl font-bold text-white mb-2">Clear Watch History?</h3>
+              <p className="text-gray-400 mb-6">
+                Are you sure you want to clear your entire watch history? This action cannot be undone and will remove all {history.length} items from your activity.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowClearHistoryModal(false)}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-colors font-medium text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleClearHistory}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors font-medium text-sm flex items-center gap-2"
+                >
+                  Yes, Clear History
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const tokenRecord = db.prepare("SELECT * FROM verification_tokens WHERE email = ? ORDER BY createdAt DESC LIMIT 1").get(email) as any;
+    const tokenRecord = db.prepare("SELECT * FROM verification_tokens WHERE email = ? ORDER BY expiresAt DESC LIMIT 1").get(email) as any;
 
     if (!tokenRecord) {
       return NextResponse.json({ error: "No verification request found for this email" }, { status: 404 });

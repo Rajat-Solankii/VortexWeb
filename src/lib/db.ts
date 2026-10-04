@@ -7,6 +7,35 @@ export const db = new Database(dbPath);
 
 // Initialize tables if they don't exist
 db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    email TEXT UNIQUE,
+    password TEXT,
+    image TEXT,
+    role TEXT DEFAULT 'user',
+    isVerified INTEGER DEFAULT 0,
+    lastIp TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS banned_ips (
+    ip TEXT PRIMARY KEY,
+    reason TEXT,
+    bannedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS verification_tokens (
+    email TEXT NOT NULL,
+    token TEXT NOT NULL,
+    expiresAt DATETIME NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS bookmarks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId TEXT NOT NULL,

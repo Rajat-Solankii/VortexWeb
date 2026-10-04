@@ -2,14 +2,14 @@
 import { useEffect, useState } from "react";
 import MediaRow from "./MediaRow";
 import { HistoryItem } from "./HistoryTracker";
-import { createClient } from "@/utils/supabase/client";
+import { useSession } from "next-auth/react";
 
 export default function RecentlyPlayedRow() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const supabase = createClient();
+  const { data: session } = useSession();
 
   useEffect(() => {
     setIsClient(true);
@@ -22,22 +22,14 @@ export default function RecentlyPlayedRow() {
           setHistory(localHistory);
         }
 
-        // Try to fetch from Supabase
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data, error } = await supabase
-            .from("user_profiles")
-            .select("watch_history")
-            .eq("user_id", user.id)
-            .single();
-            
-          if (data && data.watch_history) {
-            // If cloud history has more items or is newer (we just assume cloud wins for now)
-            // But realistically we should merge them based on timestamp. For simplicity, we just use cloud if it exists and has items
-            const cloudHistory = data.watch_history as HistoryItem[];
-            if (cloudHistory.length > 0) {
-              setHistory(cloudHistory);
-              localStorage.setItem("vortex_history", JSON.stringify(cloudHistory));
+        // Try to fetch from Custom API
+        if (session?.user) {
+          const res = await fetch("/api/history");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.history && data.history.length > 0) {
+              setHistory(data.history);
+              localStorage.setItem("vortex_history", JSON.stringify(data.history));
             }
           }
         }
@@ -47,18 +39,15 @@ export default function RecentlyPlayedRow() {
     };
     
     loadHistory();
-  }, []);
+  }, [session]);
 
   const syncToCloud = async (newHistory: HistoryItem[]) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await supabase
-        .from("user_profiles")
-        .upsert({ 
-          user_id: user.id, 
-          watch_history: newHistory,
-          updated_at: new Date().toISOString()
-        });
+    if (session?.user) {
+      await fetch("/api/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ history: newHistory })
+      });
     }
   };
 

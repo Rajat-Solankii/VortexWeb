@@ -49,10 +49,11 @@ export default function Navbar() {
   // Handle click outside to close suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchRef.current && !searchRef.current.contains(event.target as Node) &&
-        mobileSearchRef.current && !mobileSearchRef.current.contains(event.target as Node)
-      ) {
+      let isInside = false;
+      if (searchRef.current?.contains(event.target as Node)) isInside = true;
+      if (mobileSearchRef.current?.contains(event.target as Node)) isInside = true;
+      
+      if (!isInside) {
         setShowSuggestions(false);
       }
     };
@@ -102,33 +103,31 @@ export default function Navbar() {
     <nav className="fixed top-0 w-full z-50 bg-vortex-black/80 backdrop-blur-md border-b border-white/10">
       <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16 mx-auto">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-8">
+          {/* Left: Logo & Navigation */}
+          <div className="flex items-center gap-6 xl:gap-8 flex-shrink-0">
             <Link href="/home" className="text-2xl font-black text-vortex-purple tracking-tighter drop-shadow-[0_0_10px_rgba(124,77,255,0.8)]">
               VORTEX
             </Link>
-            {/* Alphabetical Links */}
             <div className="hidden lg:block">
               <div className="flex items-center space-x-1 xl:space-x-2">
                 <Link href="/anime" className="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-all">Anime</Link>
-                <Link href="/bollywood" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all hidden 2xl:block">Bollywood</Link>
-                <Link href="/cartoons" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all hidden xl:block">Cartoons</Link>
-                <Link href="/drama" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all hidden xl:block">Drama</Link>
-                <Link href="/hollywood" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all hidden xl:block">Hollywood</Link>
                 <Link href="/movies" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all">Movies</Link>
                 <Link href="/tv" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all">TV Shows</Link>
+                <Link href="/genres" className="text-gray-300 hover:text-white hover:bg-white/10 px-2 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-bold transition-all hidden xl:block">Genres</Link>
               </div>
             </div>
           </div>
           
-          <div className="hidden lg:flex items-center space-x-4 xl:space-x-6">
-            <div ref={searchRef} className="relative">
-              <form onSubmit={handleSearch} className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-400" />
+          {/* Middle: Wide Search Bar */}
+          <div className="hidden lg:flex flex-1 justify-center max-w-2xl px-6">
+            <div ref={searchRef} className="relative w-full">
+              <form onSubmit={handleSearch} className="relative w-full">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type="text"
-                  placeholder="Search movies, tv..."
+                  placeholder="Search movies, tv shows, anime..."
                   value={query}
                   onChange={(e) => {
                     setQuery(e.target.value);
@@ -136,7 +135,7 @@ export default function Navbar() {
                   }}
                   onFocus={() => query.trim().length >= 2 && setShowSuggestions(true)}
                   onKeyDown={handleKeyDown}
-                  className="bg-white/5 border border-white/10 text-white text-sm rounded-full focus:ring-vortex-purple focus:border-vortex-purple block w-32 xl:w-48 2xl:w-64 pl-10 p-2 transition-all placeholder-gray-400 focus:bg-white/10"
+                  className="bg-white/5 border border-white/10 text-white text-[15px] rounded-full focus:ring-2 focus:ring-[#7047eb]/50 focus:border-[#7047eb] block w-full pl-12 pr-4 py-2.5 transition-all placeholder-gray-500 focus:bg-[#141519] shadow-inner"
                 />
               </form>
               <SearchSuggestions 
@@ -148,13 +147,10 @@ export default function Navbar() {
                 query={query}
               />
             </div>
-            
-            {/* Genres between Search and Download */}
-            <Link href="/genres" className="flex items-center gap-1.5 px-2 xl:px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 hover:text-white rounded-lg text-[13px] xl:text-sm font-bold transition-all">
-                <LayoutGrid className="h-4 w-4" />
-                <span className="hidden 2xl:inline">Genres</span>
-            </Link>
+          </div>
 
+          {/* Right: Actions */}
+          <div className="hidden lg:flex items-center space-x-3 xl:space-x-5 flex-shrink-0">
             <SignInButton />
             <DownloadAppButton />
           </div>

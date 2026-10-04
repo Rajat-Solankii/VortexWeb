@@ -1,7 +1,7 @@
 const getBaseUrl = () => {
   if (typeof window === "undefined") {
-    // When Next.js builds on the server, bypass DNS and hit the proxy directly
-    return "http://127.0.0.1:8080";
+    // Use local proxy if defined (for production), otherwise use public API (for local dev)
+    return process.env.TMDB_PROXY_URL || "https://api.watchvortex.me";
   }
   return "https://api.watchvortex.me";
 };

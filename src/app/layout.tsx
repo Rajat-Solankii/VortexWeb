@@ -53,7 +53,7 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
+import AuthProvider from "@/components/AuthProvider";
 
 export default function RootLayout({
   children,
@@ -75,12 +75,14 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://cedarorbit.top" />
       </head>
       <body className="min-h-full flex flex-col bg-black">
-        <Navbar />
-        <main className="flex-grow pt-16">
-          {children}
-        </main>
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-grow pt-16">
+            {children}
+          </main>
 
-        <Footer />
+          <Footer />
+        </AuthProvider>
         <Analytics />
       </body>
     </html>

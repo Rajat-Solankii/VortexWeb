@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { TMDBItem } from "@/lib/tmdb";
-import { createClient } from "@/utils/supabase/client";
+import { useSession } from "next-auth/react";
 
 export interface HistoryItem extends TMDBItem {
   timestamp: number;
@@ -10,7 +10,7 @@ export interface HistoryItem extends TMDBItem {
 }
 
 export default function HistoryTracker({ item, season, episode }: { item: TMDBItem; season?: number; episode?: number }) {
-  const supabase = createClient();
+  const { data: session } = useSession();
 
   useEffect(() => {
     const saveHistory = async () => {
@@ -35,37 +35,25 @@ export default function HistoryTracker({ item, season, episode }: { item: TMDBIt
         
         localStorage.setItem("vortex_history", JSON.stringify(history));
 
-        // Sync to Supabase
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { error } = await supabase
-            .from("user_profiles")
-            .upsert({ 
-              user_id: user.id, 
-              watch_history: history,
-              updated_at: new Date().toISOString()
-            }, { onConflict: 'user_id' });
-            
-          if (error) {
-            console.error("Failed to sync history to Supabase:", error);
-          } else {
-            console.log("Successfully synced history to Supabase");
-          }
+        // Sync to custom API
+        if (session?.user) {
+          await fetch("/api/history", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ history })
+          });
         }
       } catch (error) {
         console.error("Failed to save to history", error);
       }
     };
 
-    // Use a small timeout to ensure localStorage has time to settle
     const timeoutId = setTimeout(() => {
       saveHistory();
     }, 1000);
     
     return () => clearTimeout(timeoutId);
-    // Only re-run if the ID or episode changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item.id, season, episode]);
+  }, [item.id, season, episode, session, item]);
 
   return null;
 }

@@ -68,8 +68,8 @@ export const authOptions: NextAuthOptions = {
             ip = "Unknown";
           }
 
-          // Check if user already exists
-          const existingUser = db.prepare('SELECT id FROM users WHERE id = ?').get(user.id);
+          // Check if user already exists by email
+          const existingUser = db.prepare('SELECT id, isVerified FROM users WHERE email = ?').get(user.email) as any;
           
           if (!existingUser) {
             // Check if this is the very first user in the database
@@ -89,30 +89,46 @@ export const authOptions: NextAuthOptions = {
                 return false; // Blocks sign in
               }
             }
+
+            // Default everyone to 'user'
+            const userRole = 'user';
+
+            const stmt = db.prepare(`
+              INSERT INTO users (id, name, email, password, image, role, lastIp, isVerified) 
+              VALUES (?, ?, ?, 'OAUTH_USER', ?, ?, ?, 1)
+            `);
+            stmt.run(user.id, user.name, user.email, user.image, userRole, ip);
+          } else {
+            // Update existing user with latest IP, image, and mark as verified if they weren't
+            const stmt = db.prepare(`
+              UPDATE users SET lastIp = ?, image = COALESCE(?, image), isVerified = 1 WHERE email = ?
+            `);
+            stmt.run(ip, user.image, user.email);
+            
+            // Link the NextAuth session token to their existing database UUID
+            user.id = existingUser.id;
           }
-
-          // Default everyone to 'user'
-          const userRole = 'user';
-
-          const stmt = db.prepare(`
-            INSERT INTO users (id, name, email, password, image, role, lastIp) 
-            VALUES (?, ?, ?, 'OAUTH_USER', ?, ?, ?)
-            ON CONFLICT(id) DO UPDATE SET 
-              name = excluded.name,
-              email = excluded.email,
-              image = excluded.image,
-              lastIp = excluded.lastIp
-          `);
-          stmt.run(user.id, user.name, user.email, user.image, userRole, ip);
         } catch (error) {
           console.error("Error upserting Google user:", error);
         }
       }
       return true;
     },
+    async jwt({ token, user, account }) {
+      if (account?.provider === "google" && user?.email) {
+        // Fetch the internal UUID we assigned in the DB
+        const dbUser = db.prepare('SELECT id FROM users WHERE email = ?').get(user.email) as { id: string };
+        if (dbUser) {
+          token.sub = dbUser.id;
+        }
+      } else if (user) {
+        token.sub = user.id;
+      }
+      return token;
+    },
     async session({ session, token }) {
-      if (session?.user) {
-        (session.user as any).id = token.sub; // This is the Google unique user ID
+      if (session?.user && token.sub) {
+        (session.user as any).id = token.sub; // This is now correctly mapped to the DB UUID
       }
       return session;
     },

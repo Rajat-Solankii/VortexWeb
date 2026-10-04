@@ -113,7 +113,6 @@ export default async function RootLayout({
     return (
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark h-full`} suppressHydrationWarning>
         <body className="min-h-full flex items-center justify-center bg-black overflow-hidden font-sans">
-          <MaintenanceWatcher />
           <BannedScreen ip={clientIp} />
         </body>
       </html>
